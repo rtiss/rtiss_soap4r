@@ -143,7 +143,11 @@ public
 
   def initialize(options)
     super()
-    @client = Client.new(nil, "RUBYJEDI-SOAP4R/#{ Version }")
+		if Client == HTTPClient && SHARED_HTTPCLIENT
+			@client = SHARED_HTTPCLIENT
+		else
+			@client = Client.new(nil, "RUBYJEDI-SOAP4R/#{ Version }")
+		end
     if @client.respond_to?(:request_filter)
       @client.request_filter << HttpPostRequestFilter.new(@filterchain)
     end
