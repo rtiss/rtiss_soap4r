@@ -42,6 +42,10 @@ end
 ## ---------------------------------------------------------------------------------------------------- ##
 
 
+def name
+  'rtiss_soap4r'
+end
+
 def version
   SOAP::VERSION::STRING
 end
@@ -54,12 +58,12 @@ task :release => :build do
   sh "git commit --allow-empty -a -m 'Release #{version}'"
   sh "git tag #{version}"
   sh "git push origin master --tags"
-  sh "gem push pkg/rtiss-soap4r-#{version}.gem"
+  sh "gem push pkg/#{name}-#{version}.gem"
 end
 
 
 task :build do
   sh "mkdir -p pkg"
-  sh "gem build rtiss_soap4r.gemspec"
-  sh "mv rtiss_soap4r-#{version}.gem pkg"
+  sh "gem build #{name}.gemspec"
+  sh "mv #{name}-#{version}.gem pkg"
 end
