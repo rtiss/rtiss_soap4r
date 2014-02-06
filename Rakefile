@@ -1,16 +1,8 @@
-require 'rake/gempackagetask'
 require 'rake/testtask'
+require File.join(File.dirname(__FILE__), 'lib', 'soap', 'version')
 
 task :default => 'test:deep'
 
-## ---------------------------------------------------------------------------------------------------- ##
-## Gem Packaging
-## ---------------------------------------------------------------------------------------------------- ##
-load 'soap4r.gemspec'
-Rake::GemPackageTask.new(SPEC) do |pkg|
-  pkg.need_zip = true
-  pkg.need_tar = true
-end
 
 ## ---------------------------------------------------------------------------------------------------- ##
 ## Unit Testing
@@ -40,4 +32,34 @@ namespace :test do
     t.verbose = !!ENV['VERBOSE']
     t.libs << 'test'
   end
+end
+
+
+## ---------------------------------------------------------------------------------------------------- ##
+#
+# Packaging tasks
+#
+## ---------------------------------------------------------------------------------------------------- ##
+
+
+def version
+  SOAP::VERSION::STRING
+end
+
+task :release => :build do
+  unless `git branch` =~ /^\* master$/
+    puts "You must be on the master branch to release!"
+    exit!
+  end
+  sh "git commit --allow-empty -a -m 'Release #{version}'"
+  sh "git tag #{version}"
+  sh "git push origin master --tags"
+  sh "gem push pkg/rtiss-soap4r-#{version}.gem"
+end
+
+
+task :build do
+  sh "mkdir -p pkg"
+  sh "gem build rtiss_soap4r.gemspec"
+  sh "mv rtiss_soap4r-#{version}.gem pkg"
 end
