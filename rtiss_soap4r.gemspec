@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.author = "Laurence A. Lee, Hiroshi NAKAMURA, Fabio Kung, Igor Jancev"
   s.email = "rubyjedi@gmail.com, nahi@ruby-lang.org, fabio.kung@gmail.com, igor@masterybits.com"
-  s.homepage = "https://github.com/rtiss/soap4r"
+  s.homepage = "https://github.com/rtiss/rtiss_soap4r"
 
   s.add_dependency("httpclient", ">= 2.1.1")
 
