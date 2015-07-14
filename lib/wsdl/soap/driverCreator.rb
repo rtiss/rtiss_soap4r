@@ -85,7 +85,7 @@ Methods = [
       %Q[self.mapping_registry = #{mrname}::EncodedRegistry\n] +
       %Q[self.literal_mapping_registry = #{mrname}::LiteralRegistry\n] +
       %Q[self.options["protocol.http.ssl_config.verify_mode"] = OpenSSL::SSL::VERIFY_NONE\n] +
-      %Q[self.options["protocol.http.basic_auth"] << [DefaultEndpointUrl, DefaultUser, DefaultPass] if (defined(DefaultUser) && defined(DefaultPass)) \n] +
+      %Q[self.options["protocol.http.basic_auth"] << [DefaultEndpointUrl, DefaultUser, DefaultPass] if defined?(DefaultUser) && defined?(DefaultPass) \n] +
       %Q[init_methods]
     end
     c.def_privatemethod("init_methods") do
