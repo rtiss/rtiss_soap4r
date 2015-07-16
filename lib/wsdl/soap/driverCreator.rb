@@ -74,7 +74,6 @@ private
     end
     c = XSD::CodeGen::ClassDef.new(class_name, "::SOAP::RPC::Driver")
     c.def_code <<-EOD
-cattr_accessor :default_endpoint_url
 Methods = [
 #{methoddef.gsub(/^/, "  ")}
 ]
@@ -82,11 +81,12 @@ Methods = [
     wsdl_name = @definitions.name ? @definitions.name.name : 'default'
     mrname = safeconstname(wsdl_name + 'MappingRegistry')
     c.def_method("initialize", "endpoint_url = nil") do
-      %Q[endpoint_url ||= default_endpoint_url\n] +
+      %Q[endpoint_url ||= DefaultEndpointUrl\n] +
+      %Q[super(endpoint_url, nil)\n] +
       %Q[self.mapping_registry = #{mrname}::EncodedRegistry\n] +
       %Q[self.literal_mapping_registry = #{mrname}::LiteralRegistry\n] +
       %Q[self.options["protocol.http.ssl_config.verify_mode"] = OpenSSL::SSL::VERIFY_NONE\n] +
-      %Q[self.options["protocol.http.basic_auth"] << [DefaultEndpointUrl, DefaultUser, DefaultPass] if defined?(DefaultUser) && defined?(DefaultPass) \n] +
+      %Q[self.options["protocol.http.basic_auth"] << [endpoint_url, DefaultUser, DefaultPass] if defined?(DefaultUser) && defined?(DefaultPass) \n] +
       %Q[init_methods]
     end
     c.def_privatemethod("init_methods") do
