@@ -99,7 +99,7 @@ class Driver
     @wiredump_file_base = nil
     @proxy = Proxy.new(endpoint_url, @soapaction, @options)
     @proxy.driver_class = self.class
-    @proxy.http_logger = self.http_logger
+    @proxy.http_logger = self.class.http_logger
   end
 
   def loadproperty(propertyname)
