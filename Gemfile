@@ -41,5 +41,5 @@ group :test do
   # gem 'unroller', :git=>'https://github.com/jayjlawrence/unroller.git', :branch=>'master'
 
   gem 'byebug' if RUBY_VERSION.to_f >= 2.0
-  gem 'soap4r-ng', :path=>'.'  # Make our development copy (this directory) available as a Gem via Bundler. Useful for running tests.
+  gem 'rtiss_soap4r', :path=>'.'  # Make our development copy (this directory) available as a Gem via Bundler. Useful for running tests.
 end
