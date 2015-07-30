@@ -99,9 +99,18 @@ class FaultError < Error
   attr_reader :faultactor
   attr_accessor :detail
 
+  def message=(message)
+    @faultmessage = message
+  end
+
   def initialize(fault)
     @faultcode = fault.faultcode
     @faultstring = fault.faultstring
+    if @faultstring and @faultstring.respond_to?('data')
+      @faultmessage = fault.faultstring.data
+    else
+      @faultmessage = nil
+    end
     @faultactor = fault.faultactor
     @detail = fault.detail
     super(self.to_s)
@@ -109,7 +118,9 @@ class FaultError < Error
 
   def to_s
     str = nil
-    if @faultstring and @faultstring.respond_to?('data')
+    if @faultmessage
+      str = @faultmessage.to_s
+    elsif @faultstring and @faultstring.respond_to?('data')
       str = @faultstring.data
     end
     str || '(No faultstring)'
