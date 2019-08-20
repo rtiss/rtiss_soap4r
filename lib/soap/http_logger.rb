@@ -12,9 +12,23 @@ module SOAP
       puts "Driver class: #{driver_class}"
       puts "Method: #{method_name}"
       puts "Request:"
-      puts Nokogiri::XML(request_string).root.to_xml
+      begin
+        puts Nokogiri::XML(request_string).root.to_xml
+      rescue => e
+        puts "NO VALID XML REQUEST:\n---------------------"
+        puts request_string
+        puts "---------------------"
+        puts e.backtrace
+      end
       puts "================================================================================================\nResponse:"
-      puts Nokogiri::XML(response_string).root.to_xml
+      begin
+        puts Nokogiri::XML(response_string).root.to_xml
+      rescue => e
+        puts "NO VALID XML RESPONSE:\n---------------------"
+        puts response_string
+        puts "---------------------"
+        puts e.backtrace
+      end
       puts "Response time: #{response_time}"
     end
   end
