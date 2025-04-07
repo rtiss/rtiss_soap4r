@@ -34,8 +34,7 @@ class DriverCreator
   def dump(porttype = nil)
     result = "require 'soap/rpc/driver'\n\n"
     if @modulepath
-      modulepath = @modulepath.respond_to?(:lines) ? @modulepath.lines : @modulepath # RubyJedi: compatible with Ruby 1.8.6 and above
-      modulepath.each do |name|
+      @modulepath.each do |name|
         result << "module #{name}\n"
       end
       result << "\n"
@@ -50,8 +49,7 @@ class DriverCreator
     end
     if @modulepath
       result << "\n"
-      modulepath = @modulepath.respond_to?(:lines) ? @modulepath.lines : @modulepath # RubyJedi: compatible with Ruby 1.8.6 and above
-      modulepath.each do |name|
+      @modulepath.each do |name|
         result << "end\n"
       end
     end
@@ -72,7 +70,10 @@ private
       # not bound or not a SOAP binding
       return ''
     end
+    address = @definitions.porttype(porttype).locations[0]
+
     c = XSD::CodeGen::ClassDef.new(class_name, "::SOAP::RPC::Driver")
+    c.def_const("DefaultEndpointUrl", ndq(address))
     c.def_code <<-EOD
 Methods = [
 #{methoddef.gsub(/^/, "  ")}
@@ -83,10 +84,8 @@ Methods = [
     c.def_method("initialize", "endpoint_url = nil") do
       %Q[endpoint_url ||= DefaultEndpointUrl\n] +
       %Q[super(endpoint_url, nil)\n] +
-      %Q[self.mapping_registry = #{mrname}::EncodedRegistry\n] +
-      %Q[self.literal_mapping_registry = #{mrname}::LiteralRegistry\n] +
-      %Q[self.options["protocol.http.ssl_config.verify_mode"] = OpenSSL::SSL::VERIFY_NONE\n] +
-      %Q[self.options["protocol.http.basic_auth"] << [endpoint_url, DefaultUser, DefaultPass] if defined?(DefaultUser) && defined?(DefaultPass) \n] +
+      %Q[self.mapping_registry = ::#{@modulepath.first}::#{mrname}::EncodedRegistry\n] +
+      %Q[self.literal_mapping_registry = ::#{@modulepath.first}::#{mrname}::LiteralRegistry\n] +
       %Q[init_methods]
     end
     c.def_privatemethod("init_methods") do

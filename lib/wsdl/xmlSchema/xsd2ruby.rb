@@ -14,7 +14,6 @@ require 'wsdl/soap/classDefCreatorSupport'
 require 'wsdl/soap/literalMappingRegistryCreator'
 require 'wsdl/soap/classNameCreator'
 require 'logger'
-require 'logger-application' unless defined?(Logger::Application)
 
 
 module WSDL
@@ -123,7 +122,6 @@ private
       filename = File.join(basedir, filename)
     end
     File.open(filename, "w") do |f|
-      f.puts "# encoding: UTF-8"
       yield f
     end
   end

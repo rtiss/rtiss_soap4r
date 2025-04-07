@@ -12,6 +12,8 @@ require 'soap/mapping/mapping'
 require 'soap/mapping/typeMap'
 require 'soap/mapping/factory'
 require 'soap/mapping/rubytypeFactory'
+
+
 module SOAP
 module Mapping
 
@@ -122,7 +124,6 @@ class EncodedRegistry
 
   StringFactory = StringFactory_.new
   BasetypeFactory = BasetypeFactory_.new
-  FixnumFactory = FixnumFactory_.new
   DateTimeFactory = DateTimeFactory_.new
   ArrayFactory = ArrayFactory_.new
   Base64Factory = Base64Factory_.new
@@ -146,7 +147,6 @@ class EncodedRegistry
       {:derived_class => true}],
     [::Float,        ::SOAP::SOAPFloat,      BasetypeFactory,
       {:derived_class => true}],
-    [::Fixnum,       ::SOAP::SOAPInt,        FixnumFactory],
     [::Integer,      ::SOAP::SOAPInt,        BasetypeFactory,
       {:derived_class => true}],
     [::Integer,      ::SOAP::SOAPLong,       BasetypeFactory,
@@ -212,7 +212,6 @@ class EncodedRegistry
       {:derived_class => true}],
     [::Float,        ::SOAP::SOAPFloat,      BasetypeFactory,
       {:derived_class => true}],
-    [::Fixnum,       ::SOAP::SOAPInt,        FixnumFactory],
     [::Integer,      ::SOAP::SOAPInt,        BasetypeFactory,
       {:derived_class => true}],
     [::Integer,      ::SOAP::SOAPLong,       BasetypeFactory,
@@ -404,26 +403,22 @@ private
   def addextend2obj(obj, attr)
     return unless attr
     attr.split(/ /).reverse_each do |mstr|
-      ext_module = Mapping.module_from_name(mstr)
-      return if ext_module.is_a?(Class) # RubyJedi:  Apparently needed for Ruby 2.1 and above?
-      obj.extend(ext_module)
+      obj.extend(Mapping.module_from_name(mstr))
     end
   end
 
   def addextend2soap(node, obj)
-    return if [Symbol, Fixnum, Bignum, Float].any?{ |c| obj.is_a?(c) }
+    return if obj.is_a?(Symbol) or obj.is_a?(Integer)
     list = (class << obj; self; end).ancestors - obj.class.ancestors
-    list = list.reject{|c| c.class == Class } ## As of Ruby 2.1 Singleton Classes are now included in the ancestry. Need to filter those out here.
-
-    return if list.empty?
-    extra_attrs = list.collect { |c|
-      name = c.name
-      if name.nil? or name.empty?
-        raise TypeError.new("singleton can't be dumped #{ obj }")
-      end
-      name
-    }.join(" ")
-    node.extraattr[RubyExtendName] = extra_attrs
+    unless list.empty?
+      node.extraattr[RubyExtendName] = list.collect { |c|
+        name = c.name
+	if name.nil? or name.empty?
+  	  raise TypeError.new("singleton can't be dumped #{ obj }")
+   	end
+	name
+      }.join(" ")
+    end
   end
 
   def stubobj2soap(obj, definition)
@@ -466,7 +461,6 @@ private
       else
         child = Mapping.get_attribute(obj, eledef.varname)
         if child.respond_to?(:each) and eledef.as_array?
-          child = child.lines if child.respond_to?(:lines) # RubyJedi: compatible with Ruby 1.8.6 and above
           child.each do |item|
             ele.add(name, typedobj2soap(item, eledef.mapped_class))
           end

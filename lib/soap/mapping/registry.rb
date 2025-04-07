@@ -106,10 +106,8 @@ private
   # Mapping.define_attr_accessor calls define_method with proc and it exhausts
   # much memory for each singleton Object.  just instance_eval instead of it.
   def __define_attr_accessor(qname)
-    # untaint depends GenSupport.safemethodname
-    name = Mapping.safemethodname(qname.name).untaint
-    # untaint depends on QName#dump
-    qnamedump = qname.dump.untaint
+    name = Mapping.safemethodname(qname.name)
+    qnamedump = qname.dump
     singleton = false
     unless self.respond_to?(name)
       singleton = true

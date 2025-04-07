@@ -41,8 +41,6 @@ public
 
   attr_accessor :mapping_registry
   attr_accessor :literal_mapping_registry
-  attr_accessor :driver_class
-  attr_accessor :http_logger
 
   attr_reader :operation
 
@@ -149,7 +147,7 @@ public
     if resopt[:generate_explicit_type].nil?
       resopt[:generate_explicit_type] = (op_info.response_use == :encoded)
     end
-    env = route(req_header, req_body, reqopt, resopt, name)
+    env = route(req_header, req_body, reqopt, resopt)
     if op_info.response_use.nil?
       return nil
     end
@@ -168,7 +166,7 @@ public
     end
   end
 
-  def route(req_header, req_body, reqopt, resopt, method_name = nil)
+  def route(req_header, req_body, reqopt, resopt)
     req_env = ::SOAP::SOAPEnvelope.new(req_header, req_body)
     unless reqopt[:envelopenamespace].nil?
       set_envelopenamespace(req_env, reqopt[:envelopenamespace])
@@ -186,17 +184,7 @@ public
       conn_data.send_contenttype = mime.headers['content-type'].str
     end
     conn_data.soapaction = reqopt[:soapaction]
-
-    start = Time.now
-    begin
-      conn_data = @streamhandler.send(@endpoint_url, conn_data)
-    rescue Exception => e
-      raise # re-raise the exception
-    ensure
-      dauer_ms = (1000 * (Time.now - start)).round
-      http_logger.log(driver_class, method_name, @endpoint_url, conn_data.send_string, conn_data.receive_string, dauer_ms) if http_logger # todo error flag
-    end
-
+    conn_data = @streamhandler.send(@endpoint_url, conn_data)
     if conn_data.receive_string.empty?
       return nil
     end

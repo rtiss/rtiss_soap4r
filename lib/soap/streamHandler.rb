@@ -56,7 +56,7 @@ class StreamHandler
     end
     charset = $1
     charset.gsub!(/"/, '') if charset
-    charset || 'utf-8'
+    charset || 'us-ascii'
   end
 
   def self.create_media_type(charset)
@@ -143,11 +143,7 @@ public
 
   def initialize(options)
     super()
-		if Client == HTTPClient && SHARED_HTTPCLIENT
-			@client = SHARED_HTTPCLIENT
-		else
-			@client = Client.new(nil, SOAP::VERSION::FORK_STRING)
-		end
+    @client = Client.new(nil, "SOAP4R/#{ Version }")
     if @client.respond_to?(:request_filter)
       @client.request_filter << HttpPostRequestFilter.new(@filterchain)
     end

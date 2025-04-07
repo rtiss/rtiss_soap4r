@@ -43,19 +43,6 @@ class Driver
   attr_reader :options
   attr_accessor :soapaction
 
-  class << self
-    # http logger should be set once on initialization
-    # It should be a subclass of SOAP::HttpLogger, for example:
-    # SPA::RPC::Driver.http_logger = SOAP::SimpleHttpLogger.new
-    def http_logger
-      @@http_logger ||= nil
-    end
-
-    def http_logger=(http_logger)
-      @@http_logger = http_logger
-    end
-  end
-
   def inspect
     "#<#{self.class}:#{@proxy.inspect}>"
   end
@@ -98,8 +85,6 @@ class Driver
     @options = setup_options
     @wiredump_file_base = nil
     @proxy = Proxy.new(endpoint_url, @soapaction, @options)
-    @proxy.driver_class = self.class
-    @proxy.http_logger = self.class.http_logger
   end
 
   def loadproperty(propertyname)

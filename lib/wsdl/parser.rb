@@ -114,10 +114,10 @@ private
     elename = ns.parse(name)
     if !parent
       if elename == DefinitionsName
-	o = Definitions.parse_element(elename)
+	      o = Definitions.parse_element(elename)
         o.location = @location
       else
-	raise UnknownElementError.new("unknown element: #{elename}")
+	      raise UnknownElementError.new("unknown element: #{elename}")
       end
       o.root = @originalroot if @originalroot   # o.root = o otherwise
     else
@@ -129,18 +129,16 @@ private
       end
       if o.nil?
         unless @ignored.key?(elename)
-          warn("ignored element: #{elename}")
+          warn("ignored element: #{elename} : #{parent.inspect}")
           @ignored[elename] = elename
         end
-	o = Documentation.new	# which accepts any element.
+	      o = Documentation.new	# which accepts any element.
       end
       # node could be a pseudo element.  pseudo element has its own parent.
       o.root = parent.root
       o.parent = parent if o.parent.nil?
     end
-    to_array_and_splice_name_to_first(attrs).each do |attr|
-      key = attr[:key]
-      value = attr[:value]
+    attrs.each do |key, value|
       attr_ele = ns.parse(key, true)
       value_ele = ns.parse(value, false)
       value_ele.source = value  # for recovery; value may not be a QName
@@ -160,19 +158,6 @@ private
 
   def decode_text(ns, text)
     @textbuf << text
-  end
-
-  def to_array_and_splice_name_to_first(attrs)
-    attrs_name = []
-    attrs_other = []
-    attrs.each do |key, value|
-      if key == "name"
-        attrs_name << { :key => key, :value => value }
-      elsif
-        attrs_other << { :key => key, :value => value }
-      end
-    end
-    attrs_name.concat(attrs_other)
   end
 end
 

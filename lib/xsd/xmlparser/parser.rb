@@ -11,6 +11,7 @@ require 'xsd/qname'
 require 'xsd/ns'
 require 'xsd/charset'
 
+
 module XSD
 module XMLParser
 
@@ -88,7 +89,6 @@ private
   def xmldecl_encoding=(charset)
     if @charset.nil?
       @charset = charset
-      p "encoding definition: #{ charset } is configured." if $DEBUG
     else
       # Definition in a stream (like HTTP) has a priority.
       p "encoding definition: #{ charset } is ignored." if $DEBUG

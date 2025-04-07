@@ -11,6 +11,7 @@ require 'xsd/qname'
 require 'xsd/charset'
 require 'soap/nestedexception'
 require 'uri'
+require 'date'
 
 ###
 ## XMLSchamaDatatypes general definitions.
@@ -503,12 +504,12 @@ private
 end
 
 
+require 'rational'
 require 'date'
 
 module XSDDateTimeImpl
-  SecInMicro = 1000000 # 1 second = 1 million microseconds
-  DayInSec = 86400	   # 24 Hours/Day * 60 Minutes/Hour * 60 Seconds/Minute
-  DayInMicro = (DayInSec * SecInMicro)
+  DayInSec = 86400	# 24 * 60 * 60
+  DayInMicro = 86400_000_000
 
   def to_obj(klass)
     if klass == Time
@@ -526,11 +527,11 @@ module XSDDateTimeImpl
     begin
       if @data.offset * DayInSec == Time.now.utc_offset
         d = @data
-        usec = (RUBY_VERSION.to_f >= 1.9) ? (d.sec_fraction * SecInMicro).to_i : (d.sec_fraction * DayInMicro).round
+	usec = (d.sec_fraction * DayInMicro).round
         Time.local(d.year, d.month, d.mday, d.hour, d.min, d.sec, usec)
       else
         d = @data.newof
-        usec = (RUBY_VERSION.to_f >= 1.9) ? (d.sec_fraction * SecInMicro).to_i : (d.sec_fraction * DayInMicro).round  
+	usec = (d.sec_fraction * DayInMicro).round
         Time.gm(d.year, d.month, d.mday, d.hour, d.min, d.sec, usec)
       end
     rescue ArgumentError
@@ -539,7 +540,7 @@ module XSDDateTimeImpl
   end
 
   def to_date
-    @data.respond_to?(:to_date) ? @data.to_date : Date.new!(@data.class.send(:jd_to_ajd, @data.jd, 0, 0), 0, @data.start)
+    Date.new0(@data.class.jd_to_ajd(@data.jd, 0, 0), 0, @data.start)
   end
 
   def to_datetime
@@ -584,10 +585,11 @@ module XSDDateTimeImpl
       t <<= 12 if t.year < 0
       t
     elsif t.is_a?(Time)
-      jd = DateTime.send(:civil_to_jd, t.year, t.mon, t.mday, DateTime::ITALY)
-      fr = DateTime.send(:time_to_day_fraction, t.hour, t.min, [t.sec, 59].min) + t.usec.to_r / DayInMicro
+      jd = DateTime.civil_to_jd(t.year, t.mon, t.mday, DateTime::ITALY)
+      fr = DateTime.time_to_day_fraction(t.hour, t.min, [t.sec, 59].min) +
+        t.usec.to_r / DayInMicro
       of = t.utc_offset.to_r / DayInSec
-      DateTime.new!(DateTime.send(:jd_to_ajd, jd, fr, of), of, DateTime::ITALY)
+      DateTime.new0(DateTime.jd_to_ajd(jd, fr, of), of, DateTime::ITALY)
     else
       screen_data_str(t)
     end
@@ -631,7 +633,7 @@ private
     if secfrac
       diffday = secfrac.to_i.to_r / (10 ** secfrac.size) / DayInSec
       data += diffday
-      # FYI: new! and jd_to_rjd are not necessary to use if you don't have
+      # FYI: new0 and jd_to_rjd are not necessary to use if you don't have
       # exceptional reason.
     end
     [data, secfrac]
@@ -647,14 +649,14 @@ private
 
   def _to_s
     year = (@data.year > 0) ? @data.year : @data.year - 1
-    s = format('%.4d-%02d-%02dT%02d:%02d:%02d', year, @data.mon, @data.mday, @data.hour, @data.min, @data.sec)
+    s = format('%.4d-%02d-%02dT%02d:%02d:%02d',
+      year, @data.mon, @data.mday, @data.hour, @data.min, @data.sec)
     if @data.sec_fraction.nonzero?
       if @secfrac
-        s << ".#{ @secfrac }"
-      elsif (RUBY_VERSION.to_f >= 1.9)
-        s << sprintf("%.16f",@data.sec_fraction.to_f).sub(/^0/, '').sub(/0*$/, '')
+  	s << ".#{ @secfrac }"
       else
-        s << sprintf("%.16f",(@data.sec_fraction * DayInSec).to_f).sub(/^0/, '').sub(/0*$/, '')
+	s << sprintf("%.16f",
+          (@data.sec_fraction * DayInSec).to_f).sub(/^0/, '').sub(/0*$/, '')
       end
     end
     add_tz(s)

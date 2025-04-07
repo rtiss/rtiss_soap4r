@@ -228,7 +228,7 @@ module GenSupport
     str = trim_eol(str)
     str = trim_indent(str)
     if indent
-      str.to_s.gsub(/^/, " " * indent)
+      str.gsub(/^/, " " * indent)
     else
       str
     end
@@ -237,25 +237,22 @@ module GenSupport
 private
 
   def trim_eol(str)
-    str = str.lines if str.respond_to?(:lines) # RubyJedi: compatible with Ruby 1.8.6 and above
-    str.collect { |line|
+    str.lines.collect { |line|
       line.sub(/\r?\n\z/, "") + "\n"
     }.join
   end
 
   def trim_indent(str)
     indent = nil
-    str = str.lines if str.respond_to?(:lines) # RubyJedi: compatible with Ruby 1.8.6 and above
-    str = str.collect { |line| untab(line) }.join
-    str = str.lines if str.respond_to?(:lines) # RubyJedi: compatible with Ruby 1.8.6 and above
-    str.each do |line|
+    str = str.lines.collect { |line| untab(line) }.join
+    str.each_line do |line|
       head = line.index(/\S/)
       if !head.nil? and (indent.nil? or head < indent)
         indent = head
       end
     end
     return str unless indent
-    str.collect { |line|
+    str.lines.collect { |line|
       line.sub(/^ {0,#{indent}}/, "")
     }.join
   end

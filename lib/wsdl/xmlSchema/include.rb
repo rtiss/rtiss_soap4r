@@ -8,6 +8,7 @@
 
 
 require 'wsdl/info'
+require 'wsdl/xmlSchema/importer'
 require 'wsdl/xmlSchema/importHandler'
 
 

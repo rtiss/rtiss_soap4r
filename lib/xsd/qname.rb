@@ -16,8 +16,8 @@ class QName
   attr_accessor :source
 
   def initialize(namespace = nil, name = nil)
-    @namespace = namespace ? namespace.to_s : nil
-    @name = name ? name.to_s : nil
+    @namespace = namespace
+    @name = name
     @source = nil
   end
 

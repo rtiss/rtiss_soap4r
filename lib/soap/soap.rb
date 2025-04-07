@@ -6,17 +6,16 @@
 # redistribute it and/or modify it under the same terms of Ruby's license;
 # either the dual license version in 2003, or any later version.
 
-
+require 'soap/ruby18ext'
 require 'xsd/qname'
 require 'xsd/charset'
 require 'soap/nestedexception'
-require 'soap/version'
 
 
 module SOAP
 
 
-Version = SOAP::VERSION::STRING # evaluates to 'SOAP4R-NG 2.0.2' or later
+VERSION = Version = '1.6.1-SNAPSHOT'
 PropertyName = 'soap/property'
 
 EnvelopeNamespace = 'http://schemas.xmlsoap.org/soap/envelope/'
@@ -99,18 +98,9 @@ class FaultError < Error
   attr_reader :faultactor
   attr_accessor :detail
 
-  def message=(message)
-    @faultmessage = message
-  end
-
   def initialize(fault)
     @faultcode = fault.faultcode
     @faultstring = fault.faultstring
-    if @faultstring and @faultstring.respond_to?('data')
-      @faultmessage = fault.faultstring.data
-    else
-      @faultmessage = nil
-    end
     @faultactor = fault.faultactor
     @detail = fault.detail
     super(self.to_s)
@@ -118,9 +108,7 @@ class FaultError < Error
 
   def to_s
     str = nil
-    if @faultmessage
-      str = @faultmessage.to_s
-    elsif @faultstring and @faultstring.respond_to?('data')
+    if @faultstring and @faultstring.respond_to?('data')
       str = @faultstring.data
     end
     str || '(No faultstring)'
@@ -159,16 +147,6 @@ unless Kernel.respond_to?(:warn)
   module Kernel
     def warn(msg)
       STDERR.puts(msg + "\n") unless $VERBOSE.nil?
-    end
-  end
-end
-
-
-# For Ruby 1.8 and below
-unless Kernel.respond_to?(:require_relative)
-  module Kernel
-    def require_relative(path)
-      require File.join(File.dirname(caller[0]), path.to_str)
     end
   end
 end

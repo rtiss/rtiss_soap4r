@@ -38,12 +38,12 @@ class Factory
   end
 
   def setiv2soap(node, obj, map)
-    if obj.class.class_variable_defined?('@@schema_element')
+    if obj.class.class_variables.include?(:@@schema_element)
       setdefinediv2soap(node, obj, map)
     else
       # should we sort instance_variables? how?
       obj.instance_variables.each do |var|
-        name = var.to_s.sub(/^@/, '')
+        name = var.to_s.sub(/^@/, '').to_sym
         elename = Mapping.name2elename(name)
         node.add(elename,
           Mapping._obj2soap(obj.instance_variable_get(var), map))

@@ -34,8 +34,7 @@ class ClientSkeltonCreator
     result = ""
     if @modulepath
       result << "\n"
-      modulepath = @modulepath.respond_to?(:lines) ? @modulepath.lines : @modulepath # RubyJedi: compatible with Ruby 1.8.6 and above      
-      result << modulepath.collect { |ele| "module #{ele}" }.join("; ")
+      result << @modulepath.each.collect { |ele| "module #{ele}" }.join("; ")
       result << "\n\n"
     end
     services.ports.each do |port|
@@ -44,8 +43,7 @@ class ClientSkeltonCreator
     end
     if @modulepath
       result << "\n\n"
-      modulepath = @modulepath.respond_to?(:lines) ? @modulepath.lines : @modulepath # RubyJedi: compatible with Ruby 1.8.6 and above      
-      result << modulepath.collect { |ele| "end" }.join("; ")
+      result << @modulepath.each.collect { |ele| "end" }.join("; ")
       result << "\n"
     end
     result

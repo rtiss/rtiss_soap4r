@@ -7,6 +7,7 @@
 # either the dual license version in 2003, or any later version.
 
 
+require 'xsd/xmlparser'
 require 'rexml/streamlistener'
 require 'rexml/document'
 
@@ -19,8 +20,12 @@ class REXMLParser < XSD::XMLParser::Parser
   include REXML::StreamListener
 
   def do_parse(string_or_readable)
-    $stderr.puts "XSD::XMLParser::REXMLParser.do_parse" if $DEBUG    
-    REXML::Document.parse_stream(string_or_readable, self)
+    source = nil
+    source = REXML::SourceFactory.create_from(string_or_readable)
+    source.encoding = charset if charset
+    # Listener passes a String in utf-8.
+    @charset = 'utf-8'
+    REXML::Document.parse_stream(source, self)
   end
 
   def epilogue
@@ -43,7 +48,7 @@ class REXMLParser < XSD::XMLParser::Parser
   end
 
   def xmldecl(version, encoding, standalone)
-    send :xmldecl_encoding=, encoding
+    # Version should be checked.
   end
 
   add_factory(self)

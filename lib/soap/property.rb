@@ -66,22 +66,12 @@ class Property
 
   KEY_REGSRC = '([^=:\\\\]*(?:\\\\.[^=:\\\\]*)*)'
   DEF_REGSRC = '\\s*' + KEY_REGSRC + '\\s*[=:]\\s*(.*)'
-  #COMMENT_REGEXP = Regexp.new('^(?:#.*|)$', nil, 'u')
-  #CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$", nil, 'u')
-  #LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$", nil, 'u')
-
-  COMMENT_REGEXP = Regexp.new('^(?:#.*|)$') # RubyJedi: Attempt at 1.9 Compatibility // , nil, 'u')
-  CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$") # RubyJedi: Attempt at 1.9 Compatibility // , nil, 'u')
-  LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$") # RubyJedi: Attempt at 1.9 Compatibility // , nil, 'u')
-  
+  COMMENT_REGEXP = Regexp.new("^(?:#.*|)$")
+  CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$")
+  LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$")
   def load(stream)
     key_prefix = ""
-    if stream.respond_to?(:each_line) # Ruby 1.9 and beyond
-      stream = stream.each_line      
-    elsif stream.respond_to?(:lines) # RubyJedi: compatible with Ruby 1.8.6
-      stream = stream.lines
-    end
-    stream.each_with_index do |line, lineno|
+    stream.readlines.each_with_index do |line, lineno|
       line.sub!(/\r?\n\z/u, '')
       case line
       when COMMENT_REGEXP
@@ -327,4 +317,18 @@ private
 end
 
 
+end
+
+
+# for ruby/1.6.
+unless Enumerable.method_defined?(:inject)
+  module Enumerable
+    def inject(init)
+      result = init
+      each do |item|
+        result = yield(result, item)
+      end
+      result
+    end
+  end
 end

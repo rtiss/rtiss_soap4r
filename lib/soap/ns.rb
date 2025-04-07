@@ -14,10 +14,6 @@ require 'soap/soap'
 
 module SOAP
 
-## Rubyjedi: Provide these (deprecated) constants for backward compatibility with older ActionWebService
-SOAPNamespaceTag = 'env'
-XSDNamespaceTag  = 'xsd'
-XSINamespaceTag  = 'xsi'
 
 class NS < XSD::NS
   KNOWN_TAG = XSD::NS::KNOWN_TAG.dup.update(

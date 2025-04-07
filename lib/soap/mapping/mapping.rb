@@ -127,7 +127,7 @@ module Mapping
   def self._obj2soap(obj, registry, type = nil)
     if obj.respond_to?(:to_xmlpart)
       SOAPRawData.new(obj)
-    elsif defined?(::REXML) && defined?(::REXML::Element) && obj.is_a?(::REXML::Element)
+    elsif defined?(::REXML) and obj.is_a?(::REXML::Element)
       SOAPRawData.new(SOAPREXMLElementWrap.new(obj))
     elsif referent = Thread.current[:SOAPMapping][:MarshalKey][obj.__id__] and
         !Thread.current[:SOAPMapping][:NoReference]
@@ -166,9 +166,10 @@ module Mapping
   #   ex. a.b => a.2eb
   #
   def self.name2elename(name)
-    name.to_s.gsub(/([^a-zA-Z0-9:_\-]+)/n) {
+    name = name.to_s
+    name.gsub(/([^a-zA-Z0-9:_\-]+)/n) {
       '.' << $1.unpack('H2' * $1.size).join('.')
-    }.gsub(/::/n, '..')
+    }.gsub(/::/n, '..').to_sym
   end
 
   def self.elename2name(name)
@@ -251,10 +252,11 @@ module Mapping
 
   def self.obj2element(obj)
     name = namespace = nil
-    if obj.instance_variable_defined?('@schema_type')
+    ivars = obj.instance_variables
+    if ivars.include?('@schema_type')
       name = obj.instance_variable_get('@schema_type')
     end
-    if obj.instance_variable_defined?('@schema_ns')
+    if ivars.include?('@schema_ns')
       namespace = obj.instance_variable_get('@schema_ns')
     end
     if !name or !namespace
@@ -332,8 +334,7 @@ module Mapping
       end
     else
       values.each do |attr_name, value|
-        # untaint depends GenSupport.safevarname
-        name = Mapping.safevarname(attr_name).untaint
+        name = Mapping.safevarname(attr_name)
         setter = name + "="
         if obj.respond_to?(setter)
           obj.__send__(setter, value)
@@ -455,8 +456,7 @@ module Mapping
           schema_element.is_concrete_definition
         definition.elements = schema_element
       else
-        default_ns = schema_ns
-        default_ns ||= schema_name.namespace if schema_name
+        default_ns = schema_name.namespace if schema_name
         default_ns ||= schema_type.namespace if schema_type
         definition.elements = parse_schema_definition(schema_element, default_ns)
         if klass < ::Array
@@ -541,8 +541,8 @@ module Mapping
   private
 
     def class_schema_variable(sym, klass)
-      var = "@@#{sym}"
-      klass.class_variable_defined?(var) ? klass.class_eval(var) : nil
+      var = "@@#{sym}".to_sym
+      klass.class_variables.include?(var) ? klass.class_eval(var) : nil
     end
 
     def protect_mapping(opt)
