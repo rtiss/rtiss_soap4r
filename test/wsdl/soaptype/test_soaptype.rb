@@ -1,14 +1,11 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL; module RPC
-
 
 class TestSOAPTYPE < Test::Unit::TestCase
   include ::SOAP
@@ -32,7 +29,7 @@ class TestSOAPTYPE < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -43,9 +40,9 @@ class TestSOAPTYPE < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('echo.rb')) if File.file?(pathname('echo.rb'))
-      File.unlink(pathname('echoMappingRegistry.rb')) if File.file?(pathname('echoMappingRegistry.rb'))
-      File.unlink(pathname('echoDriver.rb')) if File.file?(pathname('echoDriver.rb'))
+      File.unlink(pathname('echo.rb'))
+      File.unlink(pathname('echoMappingRegistry.rb'))
+      File.unlink(pathname('echoDriver.rb'))
     end
     @client.reset_stream if @client
   end
@@ -65,9 +62,9 @@ class TestSOAPTYPE < Test::Unit::TestCase
     gen.opt['mapping_registry'] = nil
     gen.opt['driver'] = nil
     gen.opt['force'] = true
-    gen.opt['module_path'] = self.class.to_s.sub(/::[^:]+$/, '')
+    gen.opt['module_path'] = "WSDL::RPC"
     gen.run
-    TestUtil.require(DIR, 'echo.rb', 'echoMappingRegistry.rb', 'echoDriver.rb')
+    TestUtil.require(DIR, 'echoDriver.rb', 'echoMappingRegistry.rb', 'echo.rb')
   end
 
   def teardown_server
@@ -81,12 +78,12 @@ class TestSOAPTYPE < Test::Unit::TestCase
   end
 
 SOAPTYPE_WSDL_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
-    <n1:echo_soaptype xmlns:n1="urn:soaptype"
-        env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <n1:echo_soaptype env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+        xmlns:n1="urn:soaptype">
       <arg xmlns:n2="urn:soaptype-type"
           xsi:type="n2:wrapper">
         <short xsi:type="xsd:short">123</short>
@@ -98,12 +95,12 @@ SOAPTYPE_WSDL_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
 </env:Envelope>]
 
 SOAPTYPE_NATIVE_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
-    <n1:echo_soaptype xmlns:n1="urn:soaptype"
-        env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <n1:echo_soaptype env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+        xmlns:n1="urn:soaptype">
       <arg xsi:type="xsd:anyType">
         <short xsi:type="xsd:short">123</short>
         <long xsi:type="xsd:long">456</long>
@@ -129,7 +126,7 @@ SOAPTYPE_NATIVE_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
     assert_equal(456, res.long)
     assert_equal(789.0, res.double)
 
-    assert_xml_equal(SOAPTYPE_WSDL_XML, parse_requestxml(str))
+    assert_equal(SOAPTYPE_WSDL_XML, parse_requestxml(str))
   end
 
   def test_stub
@@ -146,7 +143,7 @@ SOAPTYPE_NATIVE_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
     assert_equal(456, res.long)
     assert_equal(789.0, res.double)
 
-    assert_xml_equal(SOAPTYPE_WSDL_XML, parse_requestxml(str))
+    assert_equal(SOAPTYPE_WSDL_XML, parse_requestxml(str))
   end
 
   def test_native
@@ -167,7 +164,7 @@ SOAPTYPE_NATIVE_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
     assert_equal(456, res.long)
     assert_equal(789.0, res.double)
 
-    assert_xml_equal(SOAPTYPE_NATIVE_XML, parse_requestxml(str))
+    assert_equal(SOAPTYPE_NATIVE_XML, parse_requestxml(str))
   end
 
   def parse_requestxml(str)

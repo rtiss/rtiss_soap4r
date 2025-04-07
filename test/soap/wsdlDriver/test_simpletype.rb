@@ -1,9 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/httpserver'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 
 module SOAP
@@ -24,7 +22,7 @@ class TestSimpleType < Test::Unit::TestCase
   DIR = File.dirname(File.expand_path(__FILE__))
   require File.join(DIR, 'echo_version')
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -53,6 +51,7 @@ class TestSimpleType < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     teardown_client if @client
+    sleep 0.5  # Allow OS to release port
   end
 
   def teardown_server

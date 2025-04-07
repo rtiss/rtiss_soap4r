@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 $serverName = 'MSASPdotNETWebServices'
 $serverBase = 'http://www.mssoapinterop.org/asmx/simple.asmx'

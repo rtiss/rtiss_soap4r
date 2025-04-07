@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Overload
@@ -47,7 +46,7 @@ class TestOverload < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -58,11 +57,11 @@ class TestOverload < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('default.rb')) if File.file?(pathname('default.rb'))
-      File.unlink(pathname('defaultMappingRegistry.rb')) if File.file?(pathname('defaultMappingRegistry.rb'))
-      File.unlink(pathname('defaultDriver.rb')) if File.file?(pathname('defaultDriver.rb'))
-      File.unlink(pathname('defaultServant.rb')) if File.file?(pathname('defaultServant.rb'))
-      File.unlink(pathname('OverloadServiceClient.rb')) if File.file?(pathname('OverloadServiceClient.rb'))
+      File.unlink(pathname('default.rb'))
+      File.unlink(pathname('defaultMappingRegistry.rb'))
+      File.unlink(pathname('defaultDriver.rb'))
+      File.unlink(pathname('defaultServant.rb'))
+      File.unlink(pathname('OverloadServiceClient.rb'))
     end
     @client.reset_stream if @client
   end

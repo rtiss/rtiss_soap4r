@@ -1,17 +1,15 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/driver'
 require 'webrick'
 require 'webrick/httpproxy'
 require 'logger'
-
+require 'test_helper'
 
 module SOAP; module Auth
 
 
 class TestDigest < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
   ProxyPort = 17172
 
   def setup
@@ -29,6 +27,7 @@ class TestDigest < Test::Unit::TestCase
     teardown_client if @client
     teardown_proxyserver if @proxyserver
     teardown_server if @server
+    sleep 0.5  # Allow OS to release port
   end
 
   def setup_server

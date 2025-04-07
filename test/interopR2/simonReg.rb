@@ -1,10 +1,9 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 proxy = ARGV.shift || nil
 
 require 'soap/driver'
-require 'logger'
+require 'logger/application'
 
 require 'iSimonReg'
 

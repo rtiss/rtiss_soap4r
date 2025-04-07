@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - WSDL additional definitions for SOAP.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -116,7 +115,7 @@ private
   def collect_fault_messages
     result = []
     porttypes.each do |porttype|
-      port_binding = porttype.find_binding()
+      port_binding = porttype.find_binding
       next unless port_binding
       porttype.operations.each do |operation|
         op_binding = port_binding.operations.find { |ele| ele.name == operation.name }

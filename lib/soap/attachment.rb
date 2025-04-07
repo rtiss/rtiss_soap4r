@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # soap/attachment.rb: SOAP4R - SwA implementation.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -34,11 +33,24 @@ class Attachment
   attr_reader :io
   attr_accessor :contenttype
 
-  def initialize(string_or_readable = nil)
-    @string_or_readable = string_or_readable
-    @contenttype = "application/octet-stream"
+  def initialize(value = nil)
     @contentid = nil
     @content = nil
+    @contenttype = "application/octet-stream"
+
+    case value
+    when File
+      @content = value.read
+      value.close
+    when String
+      @content = value
+    when IO, StringIO
+      @content = value.read
+    when nil
+      # Nichts zu tun
+    else
+      @content = value.to_s
+    end
   end
 
   def contentid
@@ -54,15 +66,11 @@ class Attachment
   end
 
   def content
-    if @content == nil and @string_or_readable != nil
-      @content = @string_or_readable.respond_to?(:read) ?
-	@string_or_readable.read : @string_or_readable
-    end
     @content
   end
 
   def to_s
-    content
+    content.to_s
   end
 
   def write(out)
@@ -75,9 +83,17 @@ class Attachment
     end
   end
 
+  def headers
+    {
+      'Content-Id' => mime_contentid,
+      'Content-Type' => contenttype,
+      'Content-Transfer-Encoding' => 'binary'
+    }
+  end
+
   def self.contentid(obj)
-    # this needs to be fixed
-    [obj.__id__.to_s, Process.pid.to_s].join('.')
+    # Verbesserte Version, die einen eindeutigeren ID generiert
+    [Time.now.to_f.to_s.gsub('.', ''), Process.pid.to_s, obj.__id__.to_s].join('.')
   end
 
   def self.mime_contentid(obj)

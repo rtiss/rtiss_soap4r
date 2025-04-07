@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - XMLSchema element definition.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -98,7 +97,7 @@ class Element < Info
       end
     when FormAttrName
       @form = value.source
-      if @form != 'qualified' and @name.namespace
+      if @form != 'qualified' and @name && @name.namespace
         @name = XSD::QName.new(nil, @name.name)
       end
       @form

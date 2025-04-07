@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - MIME Message implementation.
 # Copyright (C) 2002  Jamie Herre.
 
@@ -50,17 +49,17 @@ class MIMEMessage
 
     def parse(str)
       header_cache = nil
-      str.each do |line|
-	case line
-	when /^\A[^\: \t]+:\s*.+$/
-	  parse_line(header_cache) if header_cache
-	  header_cache = line.sub(/\r?\n\z/, '')
-	when /^\A\s+(.*)$/
-	  # a continuous line at the beginning line crashes here.
-	  header_cache << line
-	else
-	  raise RuntimeError.new("unexpected header: #{line.inspect}")
-	end
+      str.split(/\r?\n/).each do |line|
+        case line
+        when /^\A[^\: \t]+:\s*.+$/
+          parse_line(header_cache) if header_cache
+          header_cache = line.sub(/\r?\n\z/, '')
+        when /^\A\s+(.*)$/
+          # a continuous line at the beginning line crashes here.
+          header_cache << line
+        else
+          raise RuntimeError.new("unexpected header: #{line.inspect}")
+        end
       end
       parse_line(header_cache) if header_cache
       self
@@ -77,17 +76,45 @@ class MIMEMessage
     end
 
     def parse_rhs(str)
-      a = str.split(/;+\s+/)
+      if str.is_a?(Hash)
+        header = Header.new
+        header.str = str.inspect
+        header.root = str['content-type'] || str['Content-Type'] || ''
+        str.each do |k, v|
+          header[k.downcase] = v
+        end
+        return header
+      end
+
+      parts = []
+      in_quote = false
+      current_part = ''
+
+      str.each_char do |c|
+        if c == '"'
+          in_quote = !in_quote
+          current_part << c
+        elsif c == ';' && !in_quote
+          parts << current_part.strip
+          current_part = ''
+        else
+          current_part << c
+        end
+      end
+      parts << current_part.strip if current_part.strip != ''
+
       header = Header.new
       header.str = str
-      header.root = a.shift
-      a.each do |pair|
-	if pair =~ /(\w+)\s*=\s*"?([^"]+)"?/
-	  header[$1.downcase] = $2
-	else
-	  raise RuntimeError.new("unexpected header component: #{pair.inspect}")
-	end
+      header.root = parts.shift
+
+      parts.each do |pair|
+        if pair =~ /(\w+)\s*=\s*"([^"]*)"/
+          header[$1.downcase] = $2
+        elsif pair =~ /(\w+)\s*=\s*([^;]*)/
+          header[$1.downcase] = $2.strip
+        end
       end
+
       header
     end
 
@@ -167,12 +194,11 @@ class MIMEMessage
   end
 
   def parse(head, str)
-    @headers = Headers.parse(head + "\r\n" + "From: jfh\r\n")
+    @headers = Headers.parse(head)
     boundary = @headers['content-type']['boundary']
     if boundary != nil
       parts = str.split(/--#{Regexp.quote(boundary)}\s*(?:\r\n|--\r\n)/)
-      part = parts.shift	# preamble must be ignored.
-      @parts = parts.collect { |part| Part.parse(part) }
+      @parts = parts.collect { |part| Part.parse(part) unless part.strip.empty? }.compact
     else
       @parts = [Part.parse(str)]
     end
@@ -233,9 +259,9 @@ class MIMEMessage
     str
   end
 
-  def to_s
-    str = headers_str + "\r\n\r\n" + conent_str
-  end
+  # def to_s
+  #   str = headers_str + "\r\n\r\n" + conent_str
+  # end
 end
 
 

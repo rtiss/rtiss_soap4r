@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module INetDicV06
   InterfaceNS = 'http://btonic.est.co.jp/NetDic/NetDicV06'
 

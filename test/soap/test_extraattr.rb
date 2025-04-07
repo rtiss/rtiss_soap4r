@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/processor'
 
 
@@ -9,10 +8,10 @@ module SOAP
 class TestExtrAttr < Test::Unit::TestCase
 
   HEADER_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    Id="extraattr"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope Id="extraattr"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Header Id="extraattr">
       <n1:headeritem xmlns:n1="my:foo"
           Id="extraattr"></n1:headeritem>
@@ -38,7 +37,7 @@ class TestExtrAttr < Test::Unit::TestCase
     env.extraattr["Id"] = "extraattr"
     g = SOAP::Generator.new()
     xml = g.generate(env)
-    assert_xml_equal(HEADER_XML, xml)
+    assert_equal(HEADER_XML, xml)
     #
     parser = SOAP::Parser.new
     env = parser.parse(xml)

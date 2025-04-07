@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # soap/baseData.rb: SOAP4R - Base type library
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -11,7 +10,7 @@ require 'xsd/datatypes'
 require 'soap/soap'
 require 'xsd/codegen/gensupport'
 require 'soap/mapping/mapping'
-
+require 'stringio'
 
 module SOAP
 
@@ -95,6 +94,11 @@ module SOAPBasetype
   def initialize(*arg)
     super
     @qualified = nil
+  end
+
+  def string
+    # Get the string from parent implementation and force UTF-8 encoding
+    super.force_encoding("UTF-8")
   end
 end
 
@@ -423,6 +427,14 @@ class SOAPBase64 < XSD::XSDBase64Binary
 public
 
   def initialize(value = nil)
+    if value.is_a?(StringIO)
+      value = value.string
+    end
+
+    # Handle the encoding before passing to parent
+    if value.is_a?(String) && value.encoding != Encoding::UTF_8
+      value = value.dup.force_encoding("UTF-8")
+    end
     super(value)
     @type = Type
   end

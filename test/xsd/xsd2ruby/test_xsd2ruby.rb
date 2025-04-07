@@ -1,8 +1,6 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/xmlSchema/xsd2ruby'
-
+require 'test_helper'
 
 module XSD; module XSD2Ruby
 
@@ -22,15 +20,15 @@ class TestXSD2Ruby < Test::Unit::TestCase
       gen.opt['mapper'] = nil
       gen.opt['force'] = true
       gen.run
+      TestUtil.require(DIR, 'mysample.rb', 'mysample_mapping_registry.rb', 'mysample_mapper.rb')
     end
-    TestUtil.require(DIR, 'mysample.rb', 'mysample_mapping_registry.rb', 'mysample_mapper.rb')
   end
 
   def teardown
     unless $DEBUG
-      File.unlink(pathname("mysample.rb")) if File.file?(pathname('mysample.rb'))
-      File.unlink(pathname("mysample_mapping_registry.rb")) if File.file?(pathname('mysample_mapping_registry.rb'))
-      File.unlink(pathname("mysample_mapper.rb")) if File.file?(pathname('mysample_mapper.rb'))
+      File.unlink(pathname("mysample.rb"))
+      File.unlink(pathname("mysample_mapping_registry.rb"))
+      File.unlink(pathname("mysample_mapper.rb"))
     end
     # leave generated file for debug.
   end

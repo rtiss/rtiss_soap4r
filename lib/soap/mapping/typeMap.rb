@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - Base type mapping definition
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 

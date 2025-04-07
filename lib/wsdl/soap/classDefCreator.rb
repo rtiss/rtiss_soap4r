@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - Creating class definition from WSDL
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -107,10 +106,30 @@ private
   def dump_simpletype(target = nil)
     @simpletypes.collect { |type|
       next if target and target != type.name
+
+      # Create the class definition for the simple type
       c = create_simpletypedef(@modulepath, type.name, type)
+
+      # If it's an enumeration type, add constants for the enumeration values
+      # if c && type.restriction && type.restriction.enumeration && !type.restriction.enumeration.empty?
+      #   # Add constants for each enumeration value
+      #   type.restriction.enumeration.each do |enum|
+      #     # Extract the value, depending on whether enum is an object or a string
+      #     enum_value = enum.respond_to?(:value) ? enum.value : enum.to_s
+      #
+      #     # Convert the enumeration value to a valid constant name
+      #     # e.g., "1.9" becomes "C_19"
+      #     const_name = "C_" + enum_value.gsub(/[^\w]/, '')
+      #
+      #     # Only add the new() version, not the string constant
+      #     c.def_const(const_name, "new(#{ndq(enum_value)})")
+      #   end
+      # end
+
       c ? c.dump : nil
     }.compact.join("\n")
   end
+
 
   def dump_complextype(target = nil)
     definitions = sort_dependency(@complextypes).collect { |type|

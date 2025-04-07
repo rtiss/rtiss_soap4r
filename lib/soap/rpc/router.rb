@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - RPC Routing library
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -84,14 +83,44 @@ class Router
   end
 
   def add_rpc_servant(obj, namespace)
-    ::SOAP::RPC.defined_methods(obj).each do |name|
+    # Get all public instance methods, excluding those inherited from Object
+    # Also include methods from the class's instance methods
+    # This catches methods defined with attr_accessor and similar
+    # Filter out common methods that shouldn't be exposed as SOAP operations
+    methods = (obj.public_methods(false) + obj.class.public_instance_methods(false))
+                .reject { |name| name.to_s =~ /^(initialize|__.*|inspect|to_s|class|object_id)$/ }
+
+    methods.each do |name|
       begin
-        qname = XSD::QName.new(namespace, name)
-        param_def = ::SOAP::RPC::SOAPMethod.derive_rpc_param_def(obj, name)
+        method_name = name.to_s
+        qname = XSD::QName.new(namespace, method_name)
+
+        # Try to derive parameter definitions
+        begin
+          param_def = ::SOAP::RPC::SOAPMethod.derive_rpc_param_def(obj, method_name)
+        rescue SOAP::RPC::MethodDefinitionError => e
+          # If automatic derivation fails, create a generic parameter definition
+          # that accepts any arguments
+          if obj.method(method_name).arity < 0
+            # Variable number of arguments
+            param_def = []
+          else
+            # Fixed number of arguments
+            param_def = Array.new(obj.method(method_name).arity) { |i| ["param#{i}", nil] }
+          end
+        end
+
+        # Create style/use options
         opt = create_styleuse_option(:rpc, :encoded)
-        add_rpc_operation(obj, qname, nil, name, param_def, opt)
-      rescue SOAP::RPC::MethodDefinitionError => e
-        p e if $DEBUG
+        # Add the operation
+        add_rpc_operation(obj, qname, nil, method_name, param_def, opt)
+
+        # Log successful method registration
+        STDERR.puts "Registered method: #{method_name}" if $DEBUG
+      rescue => e
+        # Log errors but don't fail completely
+        STDERR.puts "Failed to register method #{name}: #{e.message}" if $DEBUG
+        STDERR.puts e.backtrace.join("\n") if $DEBUG
       end
     end
   end

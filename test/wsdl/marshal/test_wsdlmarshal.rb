@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'soap/mapping/wsdlencodedregistry'
 require 'soap/marshal'
 require 'wsdl/soap/wsdl2ruby'
+require File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', 'test_helper.rb')
 
 
 class WSDLMarshaller
@@ -31,7 +30,8 @@ class WSDLMarshaller
   end
 end
 
-TestUtil.require(File.dirname(__FILE__), 'person_org')
+
+require File.join(File.dirname(__FILE__), 'person_org')
 
 class Person
   def ==(rhs)
@@ -63,9 +63,7 @@ class TestWSDLMarshal < Test::Unit::TestCase
     gen.opt['force'] = true
     gen.run
     compare("person_org.rb", "Person.rb")
-    unless $DEBUG
-      File.unlink(pathname('Person.rb')) if File.file?(pathname('Person.rb'))
-    end
+    File.unlink(pathname('Person.rb')) unless $DEBUG
   end
 
   def compare(expected, actual)

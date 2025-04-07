@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/baseData'
 require 'soap/mapping'
 

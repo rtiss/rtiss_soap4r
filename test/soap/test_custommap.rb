@@ -1,9 +1,8 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/marshal'
 require 'soap/rpc/standaloneServer'
 require 'soap/rpc/driver'
-
+require 'test_helper'
 
 module SOAP
 
@@ -35,7 +34,7 @@ class TestMap < Test::Unit::TestCase
   Map = SOAP::Mapping::Registry.new
   Map.add(Hash, SOAP::SOAPStruct, CustomHashFactory.new('customname'))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   class MapServer < SOAP::RPC::StandaloneServer
     def initialize(*arg)

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - Ruby type mapping utility.
 # Copyright (C) 2000-2007  NAKAMURA Hiroshi <nahi@ruby-lang.org>.
 
@@ -440,7 +439,7 @@ module Mapping
   end
 
   def self.create_schema_definition(klass, definition)
-    schema_ns = definition[:schema_ns]
+    #schema_ns = definition[:schema_ns]
     schema_name = definition[:schema_name]
     schema_type = definition[:schema_type]
     is_anonymous = definition[:is_anonymous]
@@ -541,7 +540,7 @@ module Mapping
   private
 
     def class_schema_variable(sym, klass)
-      var = "@@#{sym}".to_sym
+      var = "@@#{sym}"
       klass.class_variables.include?(var) ? klass.class_eval(var) : nil
     end
 

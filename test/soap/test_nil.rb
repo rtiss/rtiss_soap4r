@@ -1,15 +1,14 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/rpc/standaloneServer'
 require 'soap/rpc/driver'
 require 'soap/header/handler'
-
+require 'test_helper'
 
 module SOAP
 
 
 class TestNil < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   class NilServer < SOAP::RPC::StandaloneServer
     def initialize(*arg)
@@ -44,27 +43,18 @@ class TestNil < Test::Unit::TestCase
 
   require 'rexml/document'
   # emulates SOAP::Lite's nil request
-
-#  def test_soaplite_nil
-#    body = SOAP::SOAPBody.new(REXML::Document.new(<<-__XML__))
-#      <nop xsi:nil="true"/>
-#    __XML__
-#    @client.wiredump_dev = STDOUT if $DEBUG
-#    header, body = @client.invoke(nil, body)
-#    assert_equal(1, body.root_node["return"].data)
-#  end
-
   def test_soaplite_nil
-    body = SOAP::SOAPBody.new(REXML::Document.new(<<-__XML__))
-      <nop/>
-    __XML__
+    xml = <<-__XML__
+    <nop xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xsi:nil="true"/>
+  __XML__
+
+    body = SOAP::SOAPBody.new(REXML::Document.new(xml))
     @client.wiredump_dev = STDOUT if $DEBUG
     header, body = @client.invoke(nil, body)
     assert_equal(1, body.root_node["return"].data)
   end
-
-
-
 end
 
 

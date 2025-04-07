@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - Creating driver code from WSDL.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -15,81 +14,84 @@ require 'xsd/codegen'
 
 
 module WSDL
-module SOAP
+  module SOAP
 
 
-class DriverCreator
-  include ClassDefCreatorSupport
+    class DriverCreator
+      include ClassDefCreatorSupport
 
-  attr_reader :definitions
-  attr_accessor :drivername_postfix
+      attr_reader :definitions
+      attr_accessor :drivername_postfix
 
-  def initialize(definitions, name_creator, modulepath = nil)
-    @definitions = definitions
-    @name_creator = name_creator
-    @modulepath = modulepath
-    @drivername_postfix = ''
-  end
-
-  def dump(porttype = nil)
-    result = "require 'soap/rpc/driver'\n\n"
-    if @modulepath
-      @modulepath.each do |name|
-        result << "module #{name}\n"
+      def initialize(definitions, name_creator, modulepath = nil)
+        @definitions = definitions
+        @name_creator = name_creator
+        @modulepath = modulepath
+        @drivername_postfix = ''
       end
-      result << "\n"
-    end
-    if porttype.nil?
-      @definitions.porttypes.each do |type|
-	result << dump_porttype(type.name)
-	result << "\n"
+
+      def dump(porttype = nil)
+        result = "require 'soap/rpc/driver'\n\n"
+        if @modulepath
+          @modulepath.each do |name|
+            result << "module #{name}\n"
+          end
+          result << "\n"
+        end
+        if porttype.nil?
+          @definitions.porttypes.each do |type|
+            result << dump_porttype(type.name)
+            result << "\n"
+          end
+        else
+          result << dump_porttype(porttype)
+        end
+        if @modulepath
+          result << "\n"
+          @modulepath.each do |name|
+            result << "end\n"
+          end
+        end
+        result
       end
-    else
-      result << dump_porttype(porttype)
-    end
-    if @modulepath
-      result << "\n"
-      @modulepath.each do |name|
-        result << "end\n"
-      end
-    end
-    result
-  end
 
-private
+      private
 
-  def dump_porttype(porttype)
-    drivername = porttype.name + @drivername_postfix
-    qname = XSD::QName.new(porttype.namespace, drivername)
-    class_name = mapped_class_basename(qname, @modulepath)
-    defined_const = {}
-    mdcreator = MethodDefCreator.new(@definitions, @name_creator, @modulepath, defined_const)
-    methoddef = mdcreator.dump(porttype)
-    binding = @definitions.bindings.find { |item| item.type == porttype }
-    if binding.nil? or binding.soapbinding.nil?
-      # not bound or not a SOAP binding
-      return ''
-    end
-    address = @definitions.porttype(porttype).locations[0]
+      def dump_porttype(porttype)
+        drivername = porttype.name + @drivername_postfix
+        qname = XSD::QName.new(porttype.namespace, drivername)
+        class_name = mapped_class_basename(qname, @modulepath)
+        defined_const = {}
+        mdcreator = MethodDefCreator.new(@definitions, @name_creator, @modulepath, defined_const)
+        methoddef = mdcreator.dump(porttype)
+        binding = @definitions.bindings.find { |item| item.type == porttype }
+        if binding.nil? or binding.soapbinding.nil?
+          # not bound or not a SOAP binding
+          return ''
+        end
+        address = @definitions.porttype(porttype).locations[0]
 
-    c = XSD::CodeGen::ClassDef.new(class_name, "::SOAP::RPC::Driver")
-    c.def_const("DefaultEndpointUrl", ndq(address))
-    c.def_code <<-EOD
+        c = XSD::CodeGen::ClassDef.new(class_name, "::SOAP::RPC::Driver")
+        c.def_const("DefaultEndpointUrl", ndq(address))
+        c.def_code <<-EOD
 Methods = [
 #{methoddef.gsub(/^/, "  ")}
 ]
-    EOD
-    wsdl_name = @definitions.name ? @definitions.name.name : 'default'
-    mrname = safeconstname(wsdl_name + 'MappingRegistry')
-    c.def_method("initialize", "endpoint_url = nil") do
-      %Q[endpoint_url ||= DefaultEndpointUrl\n] +
-      %Q[super(endpoint_url, nil)\n] +
-      %Q[self.mapping_registry = ::#{@modulepath.first}::#{mrname}::EncodedRegistry\n] +
-      %Q[self.literal_mapping_registry = ::#{@modulepath.first}::#{mrname}::LiteralRegistry\n] +
-      %Q[init_methods]
-    end
-    c.def_privatemethod("init_methods") do
-      <<-EOD
+  EOD
+        wsdl_name = @definitions.name ? @definitions.name.name : 'default'
+        mrname = safeconstname(wsdl_name + 'MappingRegistry')
+
+
+
+        c.def_method("initialize", "endpoint_url = nil") do
+          %Q[endpoint_url ||= DefaultEndpointUrl\n] +
+            %Q[super(endpoint_url, nil)\n] +
+            %Q[self.mapping_registry = #{mrname}::EncodedRegistry\n] +
+            %Q[self.literal_mapping_registry = #{mrname}::LiteralRegistry\n] +
+            %Q[init_methods]
+        end
+        c.def_privatemethod("init_methods") do
+          <<-EOD
         Methods.each do |definitions|
           opt = definitions.last
           if opt[:request_style] == :document
@@ -106,14 +108,14 @@ Methods = [
           end
         end
       EOD
+        end
+        defined_const.each do |ns, tag|
+          c.def_const(tag, dq(ns))
+        end
+        c.dump
+      end
     end
-    defined_const.each do |ns, tag|
-      c.def_const(tag, dq(ns))
-    end
-    c.dump
+
+
   end
-end
-
-
-end
 end

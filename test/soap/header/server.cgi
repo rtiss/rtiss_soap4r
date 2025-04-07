@@ -1,10 +1,11 @@
-# encoding: UTF-8
-$:.unshift File.expand_path( File.dirname(__FILE__) + '../../../../lib') 
+#!/usr/bin/env ruby
 
-require 'pstore'
+project_root = File.expand_path('../../../..', __FILE__)
+$LOAD_PATH.unshift(File.join(project_root, 'lib'))
+
 require 'soap/rpc/cgistub'
 require 'soap/header/simplehandler'
-
+require 'pstore'
 
 class AuthHeaderPortServer < SOAP::RPC::CGIStub
   PortName = 'http://tempuri.org/authHeaderPort'
@@ -118,5 +119,4 @@ class AuthHeaderPortServer < SOAP::RPC::CGIStub
   end
 end
 
-
-status = AuthHeaderPortServer.new('AuthHeaderPortServer', nil).start
+AuthHeaderPortServer.new('AuthHeaderPortServer', nil).start

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'soap/wsdlDriver'
 wsdl = 'http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/*checkout*/rnn/rnn/app/rnn-hash.wsdl'
 rnn = SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver

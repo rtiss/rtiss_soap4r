@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - WSDL SOAP operation definition.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -83,7 +82,7 @@ private
   end
 
   def create_param_info(name_info, param)
-    op_style = operation_style()
+    op_style = operation_style
     op_use = param.soapbody_use
     op_encodingstyle = param.soapbody_encodingstyle
     op_name = name_info.op_name

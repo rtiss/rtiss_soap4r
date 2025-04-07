@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 $KCODE = 'EUC'
 $RWIKI_DIR = 'rwiki'

@@ -1,11 +1,10 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
 require 'soap/rpc/driver'
+require 'test_helper'
 
 
 module WSDL; module Document
@@ -48,7 +47,7 @@ class TestNoSOAPAction < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server

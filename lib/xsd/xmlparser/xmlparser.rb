@@ -11,40 +11,40 @@ require 'xml/parser'
 
 
 module XSD
-module XMLParser
+  module XMLParser
 
 
-class XMLParser < XSD::XMLParser::Parser
-  class Listener < XML::Parser
-    begin
-      require 'xml/encoding-ja'
-      include XML::Encoding_ja
-    rescue LoadError
-      # uconv may not be installed.
-    end
-  end
-
-  def do_parse(string_or_readable)
-    # XMLParser passes a String in utf-8.
-    @charset = 'utf-8'
-    @parser = Listener.new
-    @parser.parse(string_or_readable) do |type, name, data|
-      case type
-      when XML::Parser::START_ELEM
-	start_element(name, data)
-      when XML::Parser::END_ELEM
-	end_element(name)
-      when XML::Parser::CDATA
-	characters(data)
-      else
-	raise FormatDecodeError.new("Unexpected XML: #{ type }/#{ name }/#{ data }.")
+    class XMLParser < XSD::XMLParser::Parser
+      class Listener < XML::Parser
+        begin
+          require 'xml/encoding-ja'
+          include XML::Encoding_ja
+        rescue LoadError
+          # uconv may not be installed.
+        end
       end
+
+      def do_parse(string_or_readable)
+        # XMLParser passes a String in utf-8.
+        @charset = 'utf-8'
+        @parser = Listener.new
+        @parser.parse(string_or_readable) do |type, name, data|
+          case type
+          when XML::Parser::START_ELEM
+            start_element(name, data)
+          when XML::Parser::END_ELEM
+            end_element(name)
+          when XML::Parser::CDATA
+            characters(data)
+          else
+            raise FormatDecodeError.new("Unexpected XML: #{ type }/#{ name }/#{ data }.")
+          end
+        end
+      end
+
+      add_factory(self)
     end
+
+
   end
-
-  add_factory(self)
-end
-
-
-end
 end

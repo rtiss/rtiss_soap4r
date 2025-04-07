@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - SOAP WSDL driver
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -6,7 +5,6 @@
 # redistribute it and/or modify it under the same terms of Ruby's license;
 # either the dual license version in 2003, or any later version.
 
-require 'soap/ruby18ext'
 require 'wsdl/parser'
 require 'wsdl/importer'
 require 'xsd/qname'

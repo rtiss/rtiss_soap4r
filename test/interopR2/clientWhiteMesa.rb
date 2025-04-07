@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 $serverName = 'WhiteMesaSOAPServer'
 $serverBase = 'http://www.whitemesa.net/interop/std'

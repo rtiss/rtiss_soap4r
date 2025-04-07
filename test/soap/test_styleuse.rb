@@ -1,8 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/httpserver'
 require 'soap/rpc/driver'
+require 'test_helper'
 
 
 module SOAP
@@ -200,7 +199,7 @@ class TestStyleUse < Test::Unit::TestCase
     end
   end
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -210,7 +209,7 @@ class TestStyleUse < Test::Unit::TestCase
   def setup_server
     @server = Server.new(
       :BindAddress => "0.0.0.0",
-      :Port => Port,
+      :Port => TestUtil.get_free_port,
       :AccessLog => [],
       :SOAPDefaultNamespace => Namespace
     )
@@ -234,6 +233,7 @@ class TestStyleUse < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     teardown_client if @client
+    sleep 0.5  # Allow OS to release port
   end
 
   def teardown_server
@@ -309,7 +309,7 @@ class TestStyleUse < Test::Unit::TestCase
   def test_doc_enc_doc_lit
     ret1, ret2 = @client.doc_enc_doc_lit('a', 1)
     # literal Array
-    assert_equal(['String', 'Fixnum'], ret1['obj1']['klass'])
+    assert_equal(%w[String Integer], ret1['obj1']['klass'])
     # same value
     assert_equal(ret1['obj1']['klass'], ret2['obj2']['klass'])
     # not the same object (not encoded)

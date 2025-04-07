@@ -1,11 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL; module ComplexContent
 
@@ -30,7 +28,7 @@ class TestEcho < Test::Unit::TestCase
   end
 
   DIR = File.dirname(File.expand_path(__FILE__))
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -41,8 +39,8 @@ class TestEcho < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('complexContent.rb')) if File.file?(pathname('complexContent.rb'))
-      File.unlink(pathname('complexContentMappingRegistry.rb')) if File.file?(pathname('complexContentMappingRegistry.rb'))
+      File.unlink(pathname('complexContent.rb'))
+      File.unlink(pathname('complexContentMappingRegistry.rb'))
     end
     @client.reset_stream if @client
   end

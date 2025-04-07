@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - Stream handler.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -6,10 +5,13 @@
 # redistribute it and/or modify it under the same terms of Ruby's license;
 # either the dual license version in 2003, or any later version.
 
+module SOAP
+  Version = "3.0.0"  # Example version number, replace with actual version
+end
 
-require 'soap/soap'
-require 'soap/httpconfigloader'
-require 'soap/filter/filterchain'
+require_relative 'soap'
+require_relative 'httpconfigloader'
+require_relative 'filter/filterchain'
 begin
   require 'stringio'
   require 'zlib'

@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/processor'
 
 
@@ -9,9 +8,9 @@ module SOAP
 class TestCustomNs < Test::Unit::TestCase
   NORMAL_XML = <<__XML__.chomp
 <?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Header>
       <n1:headeritem xmlns:n1="my:foo">hi</n1:headeritem>
   </env:Header>
@@ -25,10 +24,10 @@ __XML__
 
   CUSTOM_NS_XML = <<__XML__.chomp
 <?xml version="1.0" encoding="utf-8" ?>
-<ENV:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+<ENV:Envelope xmlns:ENV="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:myns="my:foo"
-    xmlns:ENV="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ENV:Header>
       <myns:headeritem>hi</myns:headeritem>
   </ENV:Header>
@@ -41,18 +40,18 @@ __XML__
 
   XML_WITH_DEFAULT_NS = <<__XML__.chomp
 <?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Header>
       <headeritem xmlns="my:foo">hi</headeritem>
   </env:Header>
   <env:Body>
-    <test xmlns:n1="my:bar"
-        xmlns:n2="my:foo"
+    <test xmlns="my:foo"
+        xmlns:n1="my:bar"
         n1:baz="qux"
-        n2:quxx="quxxx"
-        xmlns="my:foo">bi</test>
+        xmlns:n2="my:foo"
+        n2:quxx="quxxx">bi</test>
   </env:Body>
 </env:Envelope>
 __XML__
@@ -70,7 +69,7 @@ __XML__
     # normal
     opt = {}
     result = SOAP::Processor.marshal(env, opt)
-    assert_xml_equal(NORMAL_XML, result)
+    assert_equal(NORMAL_XML, result)
     # Envelope ns customize
     env = SOAP::SOAPEnvelope.new(header, body)
     ns = XSD::NS.new
@@ -81,7 +80,7 @@ __XML__
     tag.assign('my:bar', 'bar')
     opt = { :default_ns => ns, :default_ns_tag => tag }
     result = SOAP::Processor.marshal(env, opt)
-    assert_xml_equal(CUSTOM_NS_XML, result)
+    assert_equal(CUSTOM_NS_XML, result)
   end
 
   def test_default_namespace
@@ -98,7 +97,7 @@ __XML__
     # normal
     opt = {:use_default_namespace => true}
     result = SOAP::Processor.marshal(env, opt)
-    assert_xml_equal(XML_WITH_DEFAULT_NS, result)
+    assert_equal(XML_WITH_DEFAULT_NS, result)
   end
 end
 

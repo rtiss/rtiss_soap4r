@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 require 'soap/rpc/standaloneServer'
-require 'calc'
+require_relative 'calc'
 
 class CalcServer < SOAP::RPC::StandaloneServer
   def initialize(*arg)

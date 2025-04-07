@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - RPC element definition.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -362,7 +361,7 @@ class SOAPVoid < XSD::XSDAnySimpleType
   Name = XSD::QName.new(Mapping::RubyCustomTypeNamespace, nil)
 
 public
-  def initialize()
+  def initialize
     @elename = Name
     @id = nil
     @precedents = []

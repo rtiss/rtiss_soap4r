@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'wsdl/xmlSchema/parser'
 
 
@@ -13,7 +12,8 @@ class TestEmptyCharset < Test::Unit::TestCase
 
   def test_wsdl
     begin
-      xml = WSDL::XMLSchema::Parser.new.parse(File.open(@file) { |f| f.read })
+      content = File.read(@file, encoding: 'UTF-8').scrub
+      xml = WSDL::XMLSchema::Parser.new.parse(content)
     rescue RuntimeError
       if XSD::XMLParser.const_defined?("REXMLParser")
 	STDERR.puts("rexml cannot handle euc-jp without iconv/uconv.")

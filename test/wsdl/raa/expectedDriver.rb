@@ -1,7 +1,6 @@
-# encoding: UTF-8
-require_relative 'RAA.rb'
-require_relative 'RAAMappingRegistry.rb'
+require_relative 'expectedMappingRegistry.rb'
 require 'soap/rpc/driver'
+require_relative "#{File.expand_path(".")}/sample/showcase/soap/raa2.4/raa.rb"
 
 module WSDL::RAA
 

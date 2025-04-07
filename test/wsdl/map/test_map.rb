@@ -1,14 +1,13 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/rpc/httpserver'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL
 
 
 class TestMap < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
   DIR = File.dirname(File.expand_path(__FILE__))
 
   class Server < ::SOAP::RPC::HTTPServer
@@ -56,6 +55,7 @@ class TestMap < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     teardown_client if @client
+    sleep 0.5  # Allow OS to release port
   end
 
   def teardown_server

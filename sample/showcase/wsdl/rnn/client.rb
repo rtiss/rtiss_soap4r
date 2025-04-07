@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 
 # RNNのSOAPサービスを利用するサンプルです。詳細については、

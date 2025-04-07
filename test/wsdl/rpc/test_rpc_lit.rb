@@ -1,9 +1,8 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 if defined?(HTTPClient) and defined?(OpenSSL)
@@ -96,7 +95,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -107,15 +106,16 @@ class TestRPCLIT < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('RPC-Literal-TestDefinitions.rb')) if File.file?(pathname('RPC-Literal-TestDefinitions.rb'))
-      File.unlink(pathname('RPC-Literal-TestDefinitionsMappingRegistry.rb')) if File.file?(pathname('RPC-Literal-TestDefinitionsMappingRegistry.rb'))
-      File.unlink(pathname('RPC-Literal-TestDefinitionsDriver.rb')) if File.file?(pathname('RPC-Literal-TestDefinitionsDriver.rb'))
+      File.unlink(pathname('RPC-Literal-TestDefinitions.rb'))
+      File.unlink(pathname('RPC-Literal-TestDefinitionsMappingRegistry.rb'))
+      File.unlink(pathname('RPC-Literal-TestDefinitionsDriver.rb'))
     end
     @client.reset_stream if @client
   end
 
   def setup_server
-    @server = Server.new('Test', Server::Namespace, '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = Server.new('Test', Server::Namespace, '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @server_thread = TestUtil.start_server_thread(@server)
   end
@@ -147,7 +147,7 @@ class TestRPCLIT < Test::Unit::TestCase
   def test_wsdl_echoStringArray
     wsdl = pathname('test-rpc-lit.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDOUT if $DEBUG
     # response contains only 1 part.
     result = @client.echoStringArray(ArrayOfstring["a", "b", "c"])[0]
@@ -156,9 +156,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStringArray xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <inputStringArray xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -172,9 +172,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStringArrayResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <n1:return xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -187,23 +187,23 @@ class TestRPCLIT < Test::Unit::TestCase
 </env:Envelope>]
 
   def test_stub_echoStringArray
-    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{Port}/")
+    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{@port}/")
     drv.wiredump_dev = str = ''
     drv.generate_explicit_type = false
     # response contains only 1 part.
     result = drv.echoStringArray(ArrayOfstring["a", "b", "c"])[0]
-    assert_xml_equal(ECHO_STRING_ARRAY_REQUEST, parse_requestxml(str),
+    assert_equal(ECHO_STRING_ARRAY_REQUEST, parse_requestxml(str),
       [ECHO_STRING_ARRAY_REQUEST, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_STRING_ARRAY_RESPONSE, parse_responsexml(str),
+    assert_equal(ECHO_STRING_ARRAY_RESPONSE, parse_responsexml(str),
       [ECHO_STRING_ARRAY_RESPONSE, parse_responsexml(str)].join("\n\n"))
     assert_equal(ArrayOfstring["a", "b", "c"], result)
   end
 
   ECHO_STRING_ARRAY_INLINE_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStringArrayInline xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <inputStringArray>
@@ -217,9 +217,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_INLINE_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStringArrayInlineResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <n1:return>
@@ -232,22 +232,22 @@ class TestRPCLIT < Test::Unit::TestCase
 </env:Envelope>]
 
   def test_stub_echoStringArrayInline
-    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{Port}/")
+    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{@port}/")
     drv.wiredump_dev = str = ''
     drv.generate_explicit_type = false
     # response contains only 1 part.
     result = drv.echoStringArrayInline(ArrayOfstringInline["a", "b", "c"])[0]
     assert_equal(ArrayOfstring["a", "b", "c"], result)
-    assert_xml_equal(ECHO_STRING_ARRAY_INLINE_REQUEST, parse_requestxml(str),
+    assert_equal(ECHO_STRING_ARRAY_INLINE_REQUEST, parse_requestxml(str),
       [ECHO_STRING_ARRAY_INLINE_REQUEST, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_STRING_ARRAY_INLINE_RESPONSE, parse_responsexml(str))
+    assert_equal(ECHO_STRING_ARRAY_INLINE_RESPONSE, parse_responsexml(str))
   end
 
   ECHO_NESTED_STRUCT_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoNestedStruct xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <inputStruct xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -266,9 +266,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoNestedStructResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <n1:return xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -288,7 +288,7 @@ class TestRPCLIT < Test::Unit::TestCase
   def test_wsdl_echoNestedStruct
     wsdl = pathname('test-rpc-lit.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = str = ''
     @client.generate_explicit_type = false
     # response contains only 1 part.
@@ -299,16 +299,16 @@ class TestRPCLIT < Test::Unit::TestCase
     assert_equal('str', result.structItem.varString)
     assert_equal('1', result.structItem.varInt)
     assert_equal('+1', result.structItem.varFloat)
-    assert_xml_equal(ECHO_NESTED_STRUCT_REQUEST, parse_requestxml(str),
+    assert_equal(ECHO_NESTED_STRUCT_REQUEST, parse_requestxml(str),
       [ECHO_NESTED_STRUCT_REQUEST, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_NESTED_STRUCT_RESPONSE, parse_responsexml(str))
+    assert_equal(ECHO_NESTED_STRUCT_RESPONSE, parse_responsexml(str))
   end
 
   ECHO_NESTED_STRUCT_REQUEST_NIL =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoNestedStruct xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <inputStruct xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -326,9 +326,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_RESPONSE_NIL =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoNestedStructResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <n1:return xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -345,19 +345,19 @@ class TestRPCLIT < Test::Unit::TestCase
   def test_wsdl_echoNestedStruct_nil
     wsdl = pathname('test-rpc-lit.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = str = ''
     @client.generate_explicit_type = false
     result = @client.echoNestedStruct(SOAPStructStruct.new("str", nil, 1.0, SOAPStruct.new("str", ::SOAP::SOAPNil.new, 1.0)))[0]
     assert(!result.respond_to?(:varInt))
     assert(result.respond_to?(:varString))
-    assert_xml_equal(ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str),
+    assert_equal(ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str),
       [ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_NESTED_STRUCT_RESPONSE_NIL, parse_responsexml(str))
+    assert_equal(ECHO_NESTED_STRUCT_RESPONSE_NIL, parse_responsexml(str))
   end
 
   def test_stub_echoNestedStruct
-    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{Port}/")
+    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{@port}/")
     drv.wiredump_dev = str = ''
     drv.generate_explicit_type = false
     # response contains only 1 part.
@@ -368,28 +368,28 @@ class TestRPCLIT < Test::Unit::TestCase
     assert_equal('str', result.structItem.varString)
     assert_equal(1, result.structItem.varInt)
     assert_equal(1.0, result.structItem.varFloat)
-    assert_xml_equal(ECHO_NESTED_STRUCT_REQUEST, parse_requestxml(str))
-    assert_xml_equal(ECHO_NESTED_STRUCT_RESPONSE, parse_responsexml(str))
+    assert_equal(ECHO_NESTED_STRUCT_REQUEST, parse_requestxml(str))
+    assert_equal(ECHO_NESTED_STRUCT_RESPONSE, parse_responsexml(str))
   end
 
   def test_stub_echoNestedStruct_nil
-    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{Port}/")
+    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{@port}/")
     drv.wiredump_dev = str = ''
     drv.generate_explicit_type = false
     # response contains only 1 part.
     result = drv.echoNestedStruct(SOAPStructStruct.new("str", nil, 1.0, SOAPStruct.new("str", ::SOAP::SOAPNil.new, 1.0)))[0]
     assert(result.respond_to?(:varInt))
     assert(result.respond_to?(:varString))
-    assert_xml_equal(ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str),
+    assert_equal(ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str),
       [ECHO_NESTED_STRUCT_REQUEST_NIL, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_NESTED_STRUCT_RESPONSE_NIL, parse_responsexml(str))
+    assert_equal(ECHO_NESTED_STRUCT_RESPONSE_NIL, parse_responsexml(str))
   end
 
   ECHO_STRUCT_ARRAY_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStructArray xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <inputStructArray xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -410,9 +410,9 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRUCT_ARRAY_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:echoStructArrayResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
       <n1:return xmlns:n2="http://soapbuilders.org/rpc-lit-test/types">
@@ -434,26 +434,26 @@ class TestRPCLIT < Test::Unit::TestCase
   def test_wsdl_echoStructArray
     wsdl = pathname('test-rpc-lit.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = str = ''
     @client.generate_explicit_type = false
     # response contains only 1 part.
     e = SOAPStruct.new("str", 2, 2.1)
     result = @client.echoStructArray(ArrayOfSOAPStruct[e, e])
-    assert_xml_equal(ECHO_STRUCT_ARRAY_REQUEST, parse_requestxml(str),
+    assert_equal(ECHO_STRUCT_ARRAY_REQUEST, parse_requestxml(str),
       [ECHO_STRUCT_ARRAY_REQUEST, parse_requestxml(str)].join("\n\n"))
-    assert_xml_equal(ECHO_STRUCT_ARRAY_RESPONSE, parse_responsexml(str))
+    assert_equal(ECHO_STRUCT_ARRAY_RESPONSE, parse_responsexml(str))
   end
 
   def test_stub_echoStructArray
-    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{Port}/")
+    drv = SoapTestPortTypeRpcLit.new("http://localhost:#{@port}/")
     drv.wiredump_dev = str = ''
     drv.generate_explicit_type = false
     # response contains only 1 part.
     e = SOAPStruct.new("str", 2, 2.1)
     result = drv.echoStructArray(ArrayOfSOAPStruct[e, e])
-    assert_xml_equal(ECHO_STRUCT_ARRAY_REQUEST, parse_requestxml(str))
-    assert_xml_equal(ECHO_STRUCT_ARRAY_RESPONSE, parse_responsexml(str))
+    assert_equal(ECHO_STRUCT_ARRAY_REQUEST, parse_requestxml(str))
+    assert_equal(ECHO_STRUCT_ARRAY_RESPONSE, parse_responsexml(str))
   end
 
   def parse_requestxml(str)

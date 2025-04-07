@@ -1,5 +1,6 @@
-# encoding: ASCII-8BIT
-require 'helper'
+# encoding: US-ASCII
+
+require 'test/unit'
 require 'xsd/datatypes'
 
 
@@ -942,10 +943,9 @@ class TestXSD2 < Test::Unit::TestCase
       "http://foo/bar/baz",
       "http://foo/bar#baz",
       "http://foo/bar%20%20?a+b",
-      "HTTP://FOO/BAR%20%20?A+B",
+      "http://FOO/BAR%20%20?A+B",
     ]
     targets.each do |str|
-      str = str.downcase if RUBY_VERSION.to_f > 1.9
       assert_parsed_result(XSD::XSDAnyURI, str)
     end
   end

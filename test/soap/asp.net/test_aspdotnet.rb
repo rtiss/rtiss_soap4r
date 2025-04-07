@@ -1,8 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/standaloneServer'
 require 'soap/rpc/driver'
+require 'test_helper'
 
 
 module SOAP; module ASPDotNet
@@ -28,7 +27,7 @@ class TestASPDotNet < Test::Unit::TestCase
     end
   end
 
-  Port = 17171
+  Port = TestUtil.get_free_port
   Endpoint = "http://localhost:#{Port}/"
 
   def setup
@@ -93,9 +92,9 @@ __XML__
     # qualified!
     REQUEST_ASPDOTNETHANDLER =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:sayHello xmlns:n1="http://localhost/WebService/">
       <n1:name>Mike</n1:name>
@@ -109,7 +108,7 @@ __XML__
       @client.add_method_with_soapaction('sayHello', Server::Namespace + 'SayHello', 'name')
       @client.default_encodingstyle = SOAP::EncodingStyle::ASPDotNetHandler::Namespace
       assert_equal("Hello Mike", @client.sayHello("Mike"))
-      assert_xml_equal(REQUEST_ASPDOTNETHANDLER, parse_requestxml(str),
+      assert_equal(REQUEST_ASPDOTNETHANDLER, parse_requestxml(str),
         [REQUEST_ASPDOTNETHANDLER, parse_requestxml(str)].join("\n\n"))
     end
 

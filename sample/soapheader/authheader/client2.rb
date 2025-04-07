@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'soap/rpc/driver'
 require 'soap/header/simplehandler'
 
@@ -25,7 +24,7 @@ class ClientAuthHeaderHandler < SOAP::Header::SimpleHandler
   end
 end
 
-ns = 'http://tempuri.org/authHeaderPort'
+ns = 'https://tempuri.org/authHeaderPort'
 serv = SOAP::RPC::Driver.new(server, ns)
 serv.add_method('login', 'userid', 'passwd')
 serv.add_method('deposit', 'amt')

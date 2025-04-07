@@ -1,10 +1,8 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 if defined?(HTTPClient)
 
@@ -31,7 +29,7 @@ class TestQualified < Test::Unit::TestCase
   end
 
   DIR = File.dirname(File.expand_path(__FILE__))
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -42,9 +40,9 @@ class TestQualified < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('default.rb')) if File.file?(pathname('default.rb'))
-      File.unlink(pathname('defaultMappingRegistry.rb')) if File.file?(pathname('defaultMappingRegistry.rb'))
-      File.unlink(pathname('defaultDriver.rb')) if File.file?(pathname('defaultDriver.rb'))
+      File.unlink(pathname('default.rb'))
+      File.unlink(pathname('defaultMappingRegistry.rb'))
+      File.unlink(pathname('defaultDriver.rb'))
     end
     @client.reset_stream if @client
   end
@@ -69,11 +67,7 @@ class TestQualified < Test::Unit::TestCase
       gen.opt['driver'] = nil
       gen.opt['force'] = true
       gen.run
-      begin
-        require_relative './default.rb'
-      rescue
-        require 'default.rb' # RubyJedi: This exists for the benefit of Ruby 1.8.7
-      end
+      require_relative 'default.rb'
     ensure
       $".delete('default.rb')
       Dir.chdir(backupdir)
@@ -92,9 +86,9 @@ class TestQualified < Test::Unit::TestCase
 
   LOGIN_REQUEST_QUALIFIED =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:GetPrimeNumbers xmlns:n1="http://www50.brinkster.com/vbfacileinpt/np">
       <Min>2</Min>
@@ -116,7 +110,7 @@ class TestQualified < Test::Unit::TestCase
     @client.endpoint_url = "http://localhost:#{Port}/"
     @client.wiredump_dev = str = ''
     @client.GetPrimeNumbers(:Min => 2, :Max => 10)
-    assert_xml_equal(LOGIN_REQUEST_QUALIFIED, parse_requestxml(str),
+    assert_equal(LOGIN_REQUEST_QUALIFIED, parse_requestxml(str),
       [LOGIN_REQUEST_QUALIFIED, parse_requestxml(str)].join("\n\n"))
   end
 
@@ -127,7 +121,7 @@ class TestQualified < Test::Unit::TestCase
 
     @client.wiredump_dev = str = ''
     @client.getPrimeNumbers(GetPrimeNumbers.new(2, 10))
-    assert_xml_equal(LOGIN_REQUEST_QUALIFIED, parse_requestxml(str),
+    assert_equal(LOGIN_REQUEST_QUALIFIED, parse_requestxml(str),
       [LOGIN_REQUEST_QUALIFIED, parse_requestxml(str)].join("\n\n"))
   end
 

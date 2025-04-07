@@ -1,9 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/wsdlDriver'
-TestUtil.require(File.dirname(__FILE__), 'DatetimeService.rb')
-
+require_relative 'DatetimeService'
+require 'test_helper'
 
 module WSDL
 module Datetime
@@ -20,7 +18,8 @@ class TestDatetime < Test::Unit::TestCase
   end
 
   def setup_server
-    @server = DatetimePortTypeApp.new('Datetime server', nil, '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = DatetimePortTypeApp.new('Datetime server', nil, '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @t = Thread.new {
       Thread.current.abort_on_exception = true
@@ -31,7 +30,7 @@ class TestDatetime < Test::Unit::TestCase
   def setup_client
     wsdl = File.join(DIR, 'datetime.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.generate_explicit_type = true
     @client.wiredump_dev = STDOUT if $DEBUG
   end
@@ -39,6 +38,7 @@ class TestDatetime < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     teardown_client if @client
+    sleep 0.5  # Allow OS to release port
   end
 
   def teardown_server

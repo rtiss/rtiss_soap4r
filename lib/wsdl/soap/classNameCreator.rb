@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - Class name creator.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 

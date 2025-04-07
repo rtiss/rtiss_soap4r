@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'xsd/qname'
 
 # {http://www.ruby-lang.org/xmlns/soap/type/RAA/0.0.3/}Gem
@@ -8,7 +7,7 @@ require 'xsd/qname'
 #   project - Project
 #   updated - SOAP::SOAPDateTime
 #   created - SOAP::SOAPDateTime
-class Gem
+class MyGem
   attr_accessor :id
   attr_accessor :category
   attr_accessor :owner

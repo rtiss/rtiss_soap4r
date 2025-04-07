@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Document
@@ -54,7 +53,7 @@ class TestArray < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -65,15 +64,16 @@ class TestArray < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('double.rb')) if File.file?(pathname('double.rb'))
-      File.unlink(pathname('doubleMappingRegistry.rb')) if File.file?(pathname('doubleMappingRegistry.rb'))
-      File.unlink(pathname('doubleDriver.rb')) if File.file?(pathname('doubleDriver.rb'))
+      File.unlink(pathname('double.rb'))
+      File.unlink(pathname('doubleMappingRegistry.rb'))
+      File.unlink(pathname('doubleDriver.rb'))
     end
     @client.reset_stream if @client
   end
 
   def setup_server
-    @server = Server.new('Test', Server::Namespace, '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = Server.new('Test', Server::Namespace, '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @server_thread = TestUtil.start_server_thread(@server)
   end
@@ -102,9 +102,9 @@ class TestArray < Test::Unit::TestCase
     File.join(DIR, filename)
   end
 
-  def test_complex_stub
+  def test_stub
     @client = PricerSoap.new
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDOUT if $DEBUG
     arg = ArrayOfComplex[c1 = Complex.new, c2 = Complex.new, c3 = Complex.new]
     c1.string = "str_c1"
@@ -124,7 +124,7 @@ class TestArray < Test::Unit::TestCase
   def test_wsdl_stubclassdef
     wsdl = File.join(DIR, 'double.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.literal_mapping_registry = DoubleMappingRegistry::LiteralRegistry
     @client.wiredump_dev = STDOUT if $DEBUG
     arg = ArrayOfDouble[0.1, 0.2, 0.3]
@@ -134,28 +134,28 @@ class TestArray < Test::Unit::TestCase
   def test_wsdl
     wsdl = File.join(DIR, 'double.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.literal_mapping_registry = DoubleMappingRegistry::LiteralRegistry
     @client.wiredump_dev = STDOUT if $DEBUG
     double = [0.1, 0.2, 0.3]
     assert_equal(double, @client.echo(:ary => double).ary)
   end
 
-  def test_stub
-    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{Port}/")
+  def test_stub_pricer
+    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{@port}/")
     @client.wiredump_dev = STDOUT if $DEBUG
     double = [0.1, 0.2, 0.3]
     assert_equal(double, @client.echo(:ary => double).ary)
   end
 
   def test_stub_nil
-    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{Port}/")
+    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{@port}/")
     @client.wiredump_dev = STDOUT if $DEBUG
     assert_equal(nil, @client.echo(Echo.new).ary)
   end
 
   def test_attribute_array
-    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{Port}/")
+    @client = ::WSDL::Document::PricerSoap.new("http://localhost:#{@port}/")
     @client.wiredump_dev = STDOUT if $DEBUG
     #
     r1 = ReportRecord.new

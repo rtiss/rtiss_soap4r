@@ -1,8 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL
@@ -33,7 +32,6 @@ class TestSimpleType < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
 
   def setup
     setup_server
@@ -41,7 +39,8 @@ class TestSimpleType < Test::Unit::TestCase
   end
 
   def setup_server
-    @server = Server.new('Test', "urn:example.com:simpletype", '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = Server.new('Test', "urn:example.com:simpletype", '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @server_thread = TestUtil.start_server_thread(@server)
   end
@@ -49,7 +48,7 @@ class TestSimpleType < Test::Unit::TestCase
   def setup_client
     wsdl = File.join(DIR, 'simpletype.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.generate_explicit_type = false
     @client.wiredump_dev = STDOUT if $DEBUG
   end
@@ -57,6 +56,7 @@ class TestSimpleType < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     teardown_client if @client
+    sleep 0.5  # Allow OS to release port
   end
 
   def teardown_server

@@ -1,8 +1,8 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/wsdlDriver'
 require 'wsdl/soap/wsdl2ruby'
+require_relative 'expectedDriver.rb'
+require 'test_helper'
 
 
 module WSDL
@@ -12,7 +12,7 @@ module RAA
 class TestRAA < Test::Unit::TestCase
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_stub
@@ -54,12 +54,13 @@ class TestRAA < Test::Unit::TestCase
   end
 
   def teardown
-    teardown_server if defined?(@server)
-    teardown_client if defined?(@client)
+    teardown_server if @server
+    teardown_client if @client
+    sleep 0.5  # Allow OS to release port
     unless $DEBUG
-      File.unlink(pathname('RAA.rb')) if File.file?(pathname('RAA.rb'))
-      File.unlink(pathname('RAAMappingRegistry.rb')) if File.file?(pathname('RAAMappingRegistry.rb'))
-      File.unlink(pathname('RAADriver.rb')) if File.file?(pathname('RAADriver.rb'))
+      File.unlink(pathname('RAA.rb'))
+      File.unlink(pathname('RAAMappingRegistry.rb'))
+      File.unlink(pathname('RAADriver.rb'))
     end
   end
 

@@ -1,11 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL; module SimpleContent
 
@@ -28,7 +26,7 @@ class TestSimpleContent < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -39,9 +37,9 @@ class TestSimpleContent < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('simpleContent.rb')) if File.file?(pathname('simpleContent.rb'))
-      File.unlink(pathname('simpleContentMappingRegistry.rb')) if File.file?(pathname('simpleContentMappingRegistry.rb'))
-      File.unlink(pathname('simpleContentDriver.rb')) if File.file?(pathname('simpleContentDriver.rb'))
+      File.unlink(pathname('simpleContent.rb'))
+      File.unlink(pathname('simpleContentMappingRegistry.rb'))
+      File.unlink(pathname('simpleContentDriver.rb'))
     end
     @client.reset_stream if @client
   end

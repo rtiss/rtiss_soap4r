@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Group
@@ -23,7 +22,7 @@ class TestGroup < Test::Unit::TestCase
         XSD::QName.new(TypeNamespace, 'groupele'),
         XSD::QName.new(TypeNamespace, 'groupele')
       )
-      self.literal_mapping_registry = EchoMappingRegistry::LiteralRegistry
+      self.literal_mapping_registry = WSDL::Group::EchoMappingRegistry::LiteralRegistry
     end
   
     def echo(arg)
@@ -39,7 +38,7 @@ class TestGroup < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -49,11 +48,9 @@ class TestGroup < Test::Unit::TestCase
 
   def teardown
     teardown_server if @server
-    unless $DEBUG
-      File.unlink(pathname('echo.rb')) if File.file?(pathname('echo.rb'))
-      File.unlink(pathname('echoMappingRegistry.rb')) if File.file?(pathname('echoMappingRegistry.rb'))
-      File.unlink(pathname('echoDriver.rb')) if File.file?(pathname('echoDriver.rb'))
-    end
+    File.unlink(pathname('echo.rb')) unless $DEBUG
+    File.unlink(pathname('echoMappingRegistry.rb')) unless $DEBUG
+    File.unlink(pathname('echoDriver.rb')) unless $DEBUG
     @client.reset_stream if @client
   end
 
@@ -71,7 +68,7 @@ class TestGroup < Test::Unit::TestCase
     gen.opt['classdef'] = nil
     gen.opt['mapping_registry'] = nil
     gen.opt['driver'] = nil
-    gen.opt['module_path'] = self.class.to_s.sub(/::[^:]+$/, '')
+    gen.opt['module_path'] = "WSDL::Group"
     gen.opt['force'] = true
     gen.run
     TestUtil.require(DIR, 'echoDriver.rb', 'echoMappingRegistry.rb', 'echo.rb')

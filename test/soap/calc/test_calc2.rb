@@ -1,16 +1,14 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/driver'
-TestUtil.require(File.dirname(__FILE__), 'server2.rb')
-
+require_relative 'server2'
+require 'test_helper'
 
 module SOAP
 module Calc
 
 
 class TestCalc2 < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     @server = CalcServer2.new('CalcServer', 'http://tempuri.org/calcService', '0.0.0.0', Port)
@@ -46,7 +44,7 @@ class TestCalc2 < Test::Unit::TestCase
     assert_equal(2.2, @var * 2.2)
     assert_equal(0, @var / 2)
     assert_equal(0.5, @var / 2.0)
-    assert_raises(ZeroDivisionError) do
+    assert_raises(SOAP::FaultError) do
       @var / 0
     end
   end

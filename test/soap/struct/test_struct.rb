@@ -1,9 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/httpserver'
 require 'soap/rpc/driver'
-
+require 'test_helper'
 
 module SOAP; module Struct
 
@@ -22,7 +20,7 @@ class TestStruct < Test::Unit::TestCase
     end
   end
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server

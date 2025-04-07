@@ -1,12 +1,9 @@
-# encoding: UTF-8
-
-require 'helper'
-require 'testutil'
-
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module SOAP; module T_WSDL2Ruby
@@ -25,7 +22,7 @@ class TestSOAPENC < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -36,7 +33,7 @@ class TestSOAPENC < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('echo.rb'))  if File.file?(pathname('echo.rb'))
+      File.unlink(pathname('echo.rb'))
     end
     @client.reset_stream if @client
   end
@@ -48,9 +45,9 @@ class TestSOAPENC < Test::Unit::TestCase
   end
 
   def setup_classdef
-    ver = ::Object.constants.detect { |c| c.to_s == "Version_struct" }
-      ::Object.instance_eval { remove_const(ver) } if ver
-
+    if ::Object.constants.include?("Version_struct")
+      ::Object.instance_eval { remove_const("Version_struct") }
+    end
     gen = WSDL::SOAP::WSDL2Ruby.new
     gen.location = pathname("soapenc.wsdl")
     gen.basedir = DIR

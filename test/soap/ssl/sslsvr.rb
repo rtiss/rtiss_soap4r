@@ -1,11 +1,8 @@
-# encoding: UTF-8
-$:.unshift File.expand_path( File.dirname(__FILE__) + '../../../../lib') 
-
 require 'webrick/https'
 require 'logger'
 require 'rbconfig'
-
 require 'soap/rpc/httpserver'
+require File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', 'test_helper.rb')
 
 class HelloWorldServer < SOAP::RPC::HTTPServer
 private
@@ -23,7 +20,7 @@ end
 
 
 if $0 == __FILE__
-  PORT = 17171
+  PORT = TestUtil.get_free_port
   DIR = File.dirname(File.expand_path(__FILE__))
 
   def cert(filename)

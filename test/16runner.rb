@@ -1,10 +1,9 @@
-# encoding: UTF-8
 require 'test/unit/testsuite'
 require 'test/unit/testcase'
 
 $KCODE = 'UTF8'
 
-rcsid = %w$Id$
+rcsid = %w$Id: 16runner.rb 1541 2005-05-10 11:28:20Z nahi $
 Version = rcsid[2].scan(/\d+/).collect!(&method(:Integer)).freeze
 Release = rcsid[3].freeze
 

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - WEBrick HTTP Server
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -7,7 +6,7 @@
 # either the dual license version in 2003, or any later version.
 
 
-require 'logger'
+require 'logger/application'
 require 'soap/attrproxy'
 require 'soap/rpc/soaplet'
 require 'soap/streamHandler'

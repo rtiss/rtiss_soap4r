@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require_relative 'echo_version.rb'
+require 'echo_version.rb'
 require 'soap/mapping'
 
 module Echo_versionMappingRegistry

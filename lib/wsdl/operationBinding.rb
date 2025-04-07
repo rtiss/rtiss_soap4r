@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - WSDL bound operation definition.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -86,12 +85,12 @@ class OperationBinding < Info
   end
 
   def operation_info
-    qname = soapoperation_name()
-    style = soapoperation_style()
+    qname = soapoperation_name
+    style = soapoperation_style
     use_input = soapbody_use(@input)
     use_output = soapbody_use(@output)
     info = OperationInfo.new(boundid, qname, style, use_input, use_output)
-    op = find_operation()
+    op = find_operation
     if style == :rpc
       info.parts.concat(collect_rpcparameter(op))
     else

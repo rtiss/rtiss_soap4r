@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'raa.rb'
+require_relative 'raa.rb'
 
 require 'soap/rpc/driver'
 
@@ -8,7 +7,7 @@ class RaaServicePortType < SOAP::RPC::Driver
   MappingRegistry = ::SOAP::Mapping::Registry.new
 
   MappingRegistry.set(
-    Gem,
+    MyGem,
     ::SOAP::SOAPStruct,
     ::SOAP::Mapping::Registry::TypedStructFactory,
     { :type => XSD::QName.new("http://www.ruby-lang.org/xmlns/soap/type/RAA/0.0.3/", "Gem") }

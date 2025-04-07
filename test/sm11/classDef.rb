@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # http://dopg.gr.jp/sm11.xsd
 class C_struct
   attr_accessor :e_boolean	# {http://www.w3.org/2001/XMLSchema}boolean

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'soap/wsdlDriver'
 
 wsdl = 'http://webservices.amazon.com/AWSECommerceService/JP/AWSECommerceService.wsdl'

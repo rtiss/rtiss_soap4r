@@ -1,15 +1,14 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/rpc/standaloneServer'
 require 'soap/rpc/driver'
 require 'soap/header/handler'
-
+require 'test_helper'
 
 module SOAP
 
 
 class TestEmpty < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   class EmptyHeaderHandler < SOAP::Header::Handler
     def on_outbound(header)
@@ -58,16 +57,16 @@ class TestEmpty < Test::Unit::TestCase
   end
 
   EMPTY_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body></env:Body>
 </env:Envelope>]
 
   EMPTY_HEADER_XML = %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Header></env:Header>
   <env:Body></env:Body>
 </env:Envelope>]
@@ -75,22 +74,22 @@ class TestEmpty < Test::Unit::TestCase
   def test_nop
     @client.wiredump_dev = str = ''
     @client.nop
-    assert_xml_equal(EMPTY_XML, parse_requestxml(str))
-    assert_xml_equal(EMPTY_XML, parse_responsexml(str))
+    assert_equal(EMPTY_XML, parse_requestxml(str))
+    assert_equal(EMPTY_XML, parse_responsexml(str))
   end
 
   def test_nop_nil
     @client.wiredump_dev = str = ''
     @client.nop_nil
-    assert_xml_equal(EMPTY_XML, parse_requestxml(str))
-    assert_xml_equal(EMPTY_XML, parse_responsexml(str))
+    assert_equal(EMPTY_XML, parse_requestxml(str))
+    assert_equal(EMPTY_XML, parse_responsexml(str))
   end
 
   def test_empty_header
     @client.headerhandler << EmptyHeaderHandler.new(nil)
     @client.wiredump_dev = str = ''
     @client.nop
-    assert_xml_equal(EMPTY_HEADER_XML, parse_requestxml(str))
+    assert_equal(EMPTY_HEADER_XML, parse_requestxml(str))
   end
 
   def parse_requestxml(str)

@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Document
@@ -30,7 +29,7 @@ class TestNumber < Test::Unit::TestCase
   end
 
   DIR = File.dirname(File.expand_path(__FILE__))
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -40,7 +39,7 @@ class TestNumber < Test::Unit::TestCase
 
   def teardown
     teardown_server if @server
-    File.unlink(pathname('foo.rb')) if File.file?(pathname('foo.rb'))
+    File.unlink(pathname('foo.rb'))
     @client.reset_stream if @client
   end
 

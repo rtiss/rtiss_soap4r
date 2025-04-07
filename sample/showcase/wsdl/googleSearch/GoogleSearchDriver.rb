@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'GoogleSearch.rb'
 
 require 'soap/rpc/driver'

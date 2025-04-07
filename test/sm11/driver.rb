@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'classDef'
 require 'soap/proxy'
 require 'soap/rpcUtils'

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - Mapping factory.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -55,7 +54,7 @@ private
 
   def setdefinediv2soap(ele, obj, map)
     definition = Mapping.schema_definition_classdef(obj.class)
-    definition.elements.each do |eledef|
+    definition&.elements&.each do |eledef|
       child = Mapping.get_attribute(obj, eledef.varname)
       # extract method
       if child.nil?
@@ -181,16 +180,27 @@ class DateTimeFactory_ < Factory
 
   def obj2soap(soap_class, obj, info, map)
     if !@allow_original_mapping and
-	Time === obj and !obj.instance_variables.empty?
+       Time === obj and !obj.instance_variables.empty?
       return nil
     end
-    soap_obj = nil
-    begin
-      soap_obj = soap_class.new(obj)
-    rescue XSD::ValueSpaceError
-      return nil
+
+    if obj.is_a?(DateTime) || obj.is_a?(Time)
+      formatted_obj = format_datetime(obj)
+      begin
+        soap_obj = soap_class.new(formatted_obj)
+      rescue XSD::ValueSpaceError
+        return nil
+      end
+      mark_marshalled_obj(obj, soap_obj)
+    else
+      begin
+        soap_obj = soap_class.new(obj)
+      rescue XSD::ValueSpaceError
+        return nil
+      end
+      mark_marshalled_obj(obj, soap_obj)
     end
-    mark_marshalled_obj(obj, soap_obj)
+
     soap_obj
   end
 
@@ -199,10 +209,29 @@ class DateTimeFactory_ < Factory
       obj = node.to_obj(obj_class)
       return false if obj.nil?
       mark_unmarshalled_obj(node, obj)
-      return true, obj
+      [true, obj]
     else
-      return false
+      false
     end
+  end
+
+  private
+
+  def format_datetime(obj)
+    if obj.is_a?(DateTime)
+      formatted = obj.strftime('%Y-%m-%dT%H:%M:%S.%3N%z')
+      if formatted[-5..-1] =~ /[+-]\d{4}/
+        formatted = formatted[0..-3] + ':' + formatted[-2..-1]
+      end
+      return formatted
+    elsif obj.is_a?(Time)
+      formatted = obj.strftime('%Y-%m-%dT%H:%M:%S.%3N%z')
+      if formatted[-5..-1] =~ /[+-]\d{4}/
+        formatted = formatted[0..-3] + ':' + formatted[-2..-1]
+      end
+      return formatted
+    end
+    obj
   end
 end
 

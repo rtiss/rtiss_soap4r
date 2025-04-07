@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'soap/header/simplehandler'
 require 'mms_MizGISDriver.rb'
 

@@ -1,14 +1,12 @@
-# encoding: UTF-8
 # coding: utf-8
-require 'helper'
-require 'soap/property'
 
+require 'test/unit'
+require 'soap/property'
 
 module SOAP
 
 
 class TestProperty < Test::Unit::TestCase
-  FrozenError = (RUBY_VERSION >= "1.9.0") ? RuntimeError : TypeError
 
   def setup
     @prop = ::SOAP::Property.new

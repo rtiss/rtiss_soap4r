@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'drb/drb'
 require 'rw-lib'
 require 'interopResultBase'

@@ -1,8 +1,7 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Fault
@@ -10,7 +9,7 @@ module WSDL; module Fault
 
 class TestFault < Test::Unit::TestCase
   DIR = File.dirname(File.expand_path(__FILE__))
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -19,12 +18,12 @@ class TestFault < Test::Unit::TestCase
   end
 
   def teardown
-    teardown_server if defined?(@server)
+    teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('Add.rb')) if File.file?(pathname('Add.rb'))
-      File.unlink(pathname('AddMappingRegistry.rb')) if File.file?(pathname('AddMappingRegistry.rb'))
-      File.unlink(pathname('AddServant.rb')) if File.file?(pathname('AddServant.rb'))
-      File.unlink(pathname('AddService.rb')) if File.file?(pathname('AddService.rb'))
+      File.unlink(pathname('Add.rb'))
+      File.unlink(pathname('AddMappingRegistry.rb'))
+      File.unlink(pathname('AddServant.rb'))
+      File.unlink(pathname('AddService.rb'))
     end
     @client.reset_stream if @client
   end
@@ -60,7 +59,7 @@ class TestFault < Test::Unit::TestCase
     TestUtil.silent do
       gen.run
     end
-    TestUtil.require(DIR, 'Add.rb', 'AddMappingRegistry.rb', 'AddServant.rb', 'AddService.rb')
+    TestUtil.require(DIR, "Add.rb", "AddMappingRegistry.rb", "AddServant.rb", "AddService.rb")
   end
 
   def teardown_server

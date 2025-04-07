@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 # You can generate raa.rb required here with the command;
 # wsdl2ruby.rb --wsdl http://www.ruby-lang.org/xmlns/soap/interface/RAA/0.0.4/ --classdef

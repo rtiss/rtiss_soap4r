@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - encoded mapping registry.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -408,16 +407,25 @@ private
   end
 
   def addextend2soap(node, obj)
-    return if obj.is_a?(Symbol) or obj.is_a?(Integer)
-    list = (class << obj; self; end).ancestors - obj.class.ancestors
-    unless list.empty?
-      node.extraattr[RubyExtendName] = list.collect { |c|
-        name = c.name
-	if name.nil? or name.empty?
-  	  raise TypeError.new("singleton can't be dumped #{ obj }")
-   	end
-	name
-      }.join(" ")
+    return if obj.is_a?(Symbol) || obj.is_a?(Integer) || obj.is_a?(Float) ||
+              obj.is_a?(TrueClass) || obj.is_a?(FalseClass) || obj.is_a?(NilClass)
+
+    begin
+      list = (class << obj; self; end).ancestors - obj.class.ancestors
+      list = list.reject{|c| c.class == Class } # Filter out singleton classes
+
+      unless list.empty?
+        node.extraattr[RubyExtendName] = list.collect { |c|
+          name = c.name
+          if name.nil? or name.empty?
+            raise TypeError.new("singleton can't be dumped #{ obj }")
+          end
+          name
+        }.join(" ")
+      end
+    rescue TypeError
+      # Object doesn't support singleton methods, just return
+      return
     end
   end
 

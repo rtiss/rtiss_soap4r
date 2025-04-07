@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'xsd/qname'
 
 # {urn:partner.soap.sforce.com}login

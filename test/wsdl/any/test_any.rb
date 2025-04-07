@@ -1,11 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL; module Any
 
@@ -65,7 +63,7 @@ class TestAny < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -76,18 +74,19 @@ class TestAny < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('echo.rb')) if File.file?(pathname('echo.rb'))
-      File.unlink(pathname('echoMappingRegistry.rb')) if File.file?(pathname('echoMappingRegistry.rb'))
-      File.unlink(pathname('echoDriver.rb')) if File.file?(pathname('echoDriver.rb'))
-      File.unlink(pathname('echoServant.rb')) if File.file?(pathname('echoServant.rb'))
-      File.unlink(pathname('echo_service.rb')) if File.file?(pathname('echo_service.rb'))
-      File.unlink(pathname('echo_serviceClient.rb')) if File.file?(pathname('echo_serviceClient.rb'))
+      File.unlink(pathname('echo.rb')) if File.exist?(pathname('echo.rb'))
+      File.unlink(pathname('echoMappingRegistry.rb')) if File.exist?(pathname('echoMappingRegistry.rb'))
+      File.unlink(pathname('echoDriver.rb')) if File.exist?(pathname('echoDriver.rb'))
+      File.unlink(pathname('echoServant.rb')) if File.exist?(pathname('echoServant.rb'))
+      File.unlink(pathname('echo_service.rb')) if File.exist?(pathname('echo_service.rb'))
+      File.unlink(pathname('echo_serviceClient.rb')) if File.exist?(pathname('echo_serviceClient.rb'))
     end
     @client.reset_stream if @client
   end
 
   def setup_server
-    @server = Server.new('Test', Namespace, '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = Server.new('Test', Namespace, '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @server_thread = TestUtil.start_server_thread(@server)
   end
@@ -145,7 +144,7 @@ class TestAny < Test::Unit::TestCase
   def test_anyreturl_wsdl
     wsdl = File.join(DIR, 'any.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDOUT if $DEBUG
     res = @client.echoAny
     assert_equal(1, res.a)
@@ -155,7 +154,7 @@ class TestAny < Test::Unit::TestCase
   def test_wsdl
     wsdl = File.join(DIR, 'any.wsdl')
     @client = ::SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDOUT if $DEBUG
     arg = FooBar.new("before", "after")
     arg.set_any(
@@ -173,7 +172,7 @@ class TestAny < Test::Unit::TestCase
 
   def test_naive
     @client = Echo_port_type.new
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDOUT if $DEBUG
     arg = FooBar.new("before", "after")
     arg.set_any(

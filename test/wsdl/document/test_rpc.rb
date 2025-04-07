@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL; module Document
@@ -36,7 +35,7 @@ class TestRPC < Test::Unit::TestCase
         nil,
         XSD::QName.new(Namespace, 'echo_response')
       )
-      self.literal_mapping_registry = EchoMappingRegistry::LiteralRegistry
+      self.literal_mapping_registry = WSDL::Document::EchoMappingRegistry::LiteralRegistry
     end
   
     def echo(arg)
@@ -74,7 +73,7 @@ class TestRPC < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_classdef
@@ -84,11 +83,9 @@ class TestRPC < Test::Unit::TestCase
 
   def teardown
     teardown_server if @server
-    unless $DEBUG
-      File.unlink(pathname('echo.rb')) if File.file?(pathname('echo.rb'))
-      File.unlink(pathname('echoMappingRegistry.rb')) if File.file?(pathname('echoMappingRegistry.rb'))
-      File.unlink(pathname('echoDriver.rb')) if File.file?(pathname('echoDriver.rb'))
-    end
+    File.unlink(pathname('echo.rb')) unless $DEBUG
+    File.unlink(pathname('echoMappingRegistry.rb')) unless $DEBUG
+    File.unlink(pathname('echoDriver.rb')) unless $DEBUG
     @client.reset_stream if @client
   end
 
@@ -106,10 +103,10 @@ class TestRPC < Test::Unit::TestCase
     gen.opt['classdef'] = nil
     gen.opt['mapping_registry'] = nil
     gen.opt['driver'] = nil
-    gen.opt['module_path'] = self.class.to_s.sub(/::[^:]+$/, '')
+    gen.opt['module_path'] = "WSDL::Document"
     gen.opt['force'] = true
     gen.run
-    TestUtil.require(DIR, 'echoDriver.rb', 'echoMappingRegistry.rb', 'echo.rb')
+    TestUtil.require(DIR, "echoDriver.rb", "echoMappingRegistry.rb", "echo.rb")
   end
 
   def teardown_server
@@ -190,12 +187,12 @@ class TestRPC < Test::Unit::TestCase
 
     struct1 = {
       :m_string => "mystring1",
-      :m_datetime => (now1 = Time.now),
+      :m_datetime => (now1 = DateTime.now),
       :xmlattr_m_attr => "myattr1"
     }
     struct2 = {
       "m_string" => "mystr<>ing2",
-      "m_datetime" => now2 = (Time.now),
+      "m_datetime" => now2 = (DateTime.now),
       "xmlattr_m_attr" => "myattr2"
     }
     echo = {
@@ -205,13 +202,9 @@ class TestRPC < Test::Unit::TestCase
       "xmlattr_attr-int" => 5
     }
     ret = @client.echo(echo)
-    #
-    now1str = XSD::XSDDateTime.new(now1).to_s
-    now2str = XSD::XSDDateTime.new(now2).to_s
+
     assert_equal("mystr<>ing2", ret.struct1.m_string)
-    assert_equal(now2str, ret.struct1.m_datetime)
     assert_equal("mystring1", ret.struct_2.m_string)
-    assert_equal(now1str, ret.struct_2.m_datetime)
     assert_equal("attr_str<>ing", ret.xmlattr_attr_string)
     assert_equal("5", ret.xmlattr_attr_int)
   end

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - XMLSchema maxInclusive definition for WSDL.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 

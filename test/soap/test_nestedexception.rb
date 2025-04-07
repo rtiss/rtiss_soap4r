@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/soap'
 
 
@@ -39,33 +38,24 @@ class TestNestedException < Test::Unit::TestCase
     end
   end
 
-  if (RUBY_VERSION.to_f >= 1.9)
-    TOBE = [
-      ":16:in `rescue in foo'",
-      ":13:in `foo'",
-      ":34:in `test_nestedexception'",
-      ":24:in `rescue in bar': bar (SOAP::TestNestedException::MyError) [NESTED]",
-      ":21:in `bar'",
-      ":14:in `foo'",
-      ":34:in `test_nestedexception'",
-      ":29:in `baz': baz (SOAP::TestNestedException::MyError) [NESTED]",
-      ":22:in `bar'",
-      ":14:in `foo'",
-      ":34:in `test_nestedexception'"
-    ]  
-  else
-    TOBE = [
-      ":16:in `foo'",
-      ":34:in `test_nestedexception'",
-      ":24:in `bar': bar (SOAP::TestNestedException::MyError) [NESTED]",
-      ":14:in `foo'",
-      ":34:in `test_nestedexception'",
-      ":29:in `baz': baz (SOAP::TestNestedException::MyError) [NESTED]",
-      ":22:in `bar'",
-      ":14:in `foo'",
-      ":34:in `test_nestedexception'",
-    ]
-  end
+  TOBE = [
+    ":15:in `rescue in foo'",
+    ":11:in `foo'",
+    ":33:in `test_nestedexception'",
+    ":12:in `run'",
+    ":23:in `rescue in bar': bar (SOAP::TestNestedException::MyError) [NESTED]",
+    ":19:in `bar'",
+    ":13:in `foo'",
+    ":33:in `test_nestedexception'",
+    ":12:in `run'",
+    ":28:in `baz': baz (SOAP::TestNestedException::MyError) [NESTED]",
+    ":21:in `bar'",
+    ":13:in `foo'",
+    ":33:in `test_nestedexception'",
+    ":12:in `run'"
+  ]
+
 end
+
 
 end

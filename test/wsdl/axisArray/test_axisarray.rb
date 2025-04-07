@@ -1,11 +1,10 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/processor'
 require 'soap/mapping'
 require 'soap/rpc/element'
 require 'wsdl/importer'
 require 'wsdl/soap/wsdl2ruby'
+require 'test_helper'
 
 
 module WSDL
@@ -45,9 +44,9 @@ __EOX__
 
   def teardown
     unless $DEBUG
-      File.unlink(pathname('itemList.rb'))  if File.file?(pathname('itemList.rb'))
-      File.unlink(pathname('itemListMappingRegistry.rb')) if File.file?(pathname('itemListMappingRegistry.rb'))
-      File.unlink(pathname('itemListDriver.rb')) if File.file?(pathname('itemListDriver.rb'))
+      File.unlink(pathname('itemList.rb'))
+      File.unlink(pathname('itemListMappingRegistry.rb'))
+      File.unlink(pathname('itemListDriver.rb'))
     end
   end
 

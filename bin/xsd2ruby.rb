@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'getoptlong'
-require 'logger'
+require 'logger/application'
 require 'wsdl/xmlSchema/xsd2ruby'
 
 

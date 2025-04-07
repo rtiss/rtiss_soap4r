@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'soap/rpc/driver'
 
 s = SOAP::RPC::Driver.new('http://localhost:2000/', 'urn:hws')

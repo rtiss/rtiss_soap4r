@@ -1,4 +1,3 @@
-# encoding: UTF-8
 $KCODE = 'EUC'
 
 require 'test/unit'

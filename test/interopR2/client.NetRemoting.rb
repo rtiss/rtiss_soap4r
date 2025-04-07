@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 $serverName = 'dotNetRemotingWebServices'
 $serverBase = 'http://www.mssoapinterop.org/remoting/ServiceA.soap'

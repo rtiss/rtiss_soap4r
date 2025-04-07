@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'xsd/qname'
 
 module WSDL; module RAA

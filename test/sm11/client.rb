@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # Done
 #   /^void/  def/
 #   /^}/  end/

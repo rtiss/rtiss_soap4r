@@ -1,9 +1,8 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 if defined?(HTTPClient)
@@ -31,7 +30,7 @@ class TestUnqualified < Test::Unit::TestCase
   end
 
   DIR = File.dirname(File.expand_path(__FILE__))
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -42,9 +41,9 @@ class TestUnqualified < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('lp.rb')) if File.file?(pathname('lp.rb'))
-      File.unlink(pathname('lpMappingRegistry.rb')) if File.file?(pathname('lpMappingRegistry.rb'))
-      File.unlink(pathname('lpDriver.rb')) if File.file?(pathname('lpDriver.rb'))
+      File.unlink(pathname('lp.rb'))
+      File.unlink(pathname('lpMappingRegistry.rb'))
+      File.unlink(pathname('lpDriver.rb'))
     end
     @client.reset_stream if @client
   end
@@ -63,17 +62,13 @@ class TestUnqualified < Test::Unit::TestCase
       gen.location = pathname("lp.wsdl")
       gen.basedir = DIR
       gen.logger.level = Logger::FATAL
-      gen.opt['module_path'] = self.class.to_s.sub(/::[^:]+$/, '')
+      gen.opt['module_path'] = "WSDL"
       gen.opt['classdef'] = nil
       gen.opt['mapping_registry'] = nil
       gen.opt['driver'] = nil
       gen.opt['force'] = true
       gen.run
-      begin
-        require_relative './lp.rb'
-      rescue
-        require 'lp.rb' # RubyJedi: This exists for the benefit of Ruby 1.8.7
-      end
+      TestUtil.require(DIR, 'lp.rb')
     ensure
       $".delete('lp.rb')
       Dir.chdir(backupdir)
@@ -92,9 +87,9 @@ class TestUnqualified < Test::Unit::TestCase
 
   LOGIN_REQUEST_QUALIFIED_UNTYPED =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<env:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
   <env:Body>
     <n1:login xmlns:n1="urn:lp">
       <username>NaHi</username>
@@ -119,17 +114,17 @@ class TestUnqualified < Test::Unit::TestCase
     @client.login(:timezone => 'JST', :password => 'passwd',
       :username => 'NaHi')
     # untyped because of passing a Hash
-    assert_xml_equal(LOGIN_REQUEST_QUALIFIED_UNTYPED, parse_requestxml(str))
+    assert_equal(LOGIN_REQUEST_QUALIFIED_UNTYPED, parse_requestxml(str))
   end
 
   include ::SOAP
   def test_naive
     TestUtil.require(DIR, 'lpDriver.rb', 'lpMappingRegistry.rb', 'lp.rb')
-    @client = Lp_porttype.new("http://localhost:#{Port}/")
+    @client = WSDL::Lp_porttype.new("http://localhost:#{Port}/")
 
     @client.wiredump_dev = str = ''
     @client.login(Login.new('NaHi', 'passwd', 'JST'))
-    assert_xml_equal(LOGIN_REQUEST_QUALIFIED_UNTYPED, parse_requestxml(str))
+    assert_equal(LOGIN_REQUEST_QUALIFIED_UNTYPED, parse_requestxml(str))
   end
 
   def parse_requestxml(str)

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # WSDL4R - Creating method definition from WSDL
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -39,13 +38,22 @@ class MethodDefCreator
   def dump(name)
     methoddef = ""
     porttype = @definitions.porttype(name)
+
+    if porttype.nil?
+      STDERR.puts "Warning: No port type with the name #{name} found"
+      return methoddef
+    end
+
     binding = porttype.find_binding
     if binding
       create(binding.name).each do |mdef|
         methoddef << ",\n" unless methoddef.empty?
         methoddef << dump_method(mdef).chomp
       end
+    else
+      STDERR.puts "Warning: No binding for the port type #{name} found"
     end
+
     methoddef
   end
 

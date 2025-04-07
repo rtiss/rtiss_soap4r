@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - SOAP XML Instance Parser library.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -8,6 +7,7 @@
 
 
 require 'xsd/xmlparser'
+require 'xsd/xmlparser/nokogiri'
 require 'soap/soap'
 require 'soap/ns'
 require 'soap/baseData'

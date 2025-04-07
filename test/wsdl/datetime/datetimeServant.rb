@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'datetime.rb'
+require_relative 'datetime'
 
 class DatetimePortType
   # SYNOPSIS

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # soap/property.rb: SOAP4R - Property implementation.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -6,7 +5,7 @@
 # redistribute it and/or modify it under the same terms of Ruby's license;
 # either the dual license version in 2003, or any later version.
 
-
+require 'stringio'
 module SOAP
 
 
@@ -33,7 +32,6 @@ module SOAP
 #     aaa.hhh = iii
 #
 class Property
-  FrozenError = (RUBY_VERSION >= "1.9.0") ? RuntimeError : TypeError
 
   include Enumerable
 
@@ -70,6 +68,7 @@ class Property
   CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$")
   LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$")
   def load(stream)
+    stream = StringIO.new(stream) if stream.is_a?(String)
     key_prefix = ""
     stream.readlines.each_with_index do |line, lineno|
       line.sub!(/\r?\n\z/u, '')

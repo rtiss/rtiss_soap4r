@@ -1,15 +1,14 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/rpc/driver'
 require 'soap/rpc/standaloneServer'
-
+require 'test_helper'
 
 module SOAP
 module Fault
 
 
 class TestCustomFault < Test::Unit::TestCase
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   class CustomFaultServer < SOAP::RPC::StandaloneServer
     def on_init

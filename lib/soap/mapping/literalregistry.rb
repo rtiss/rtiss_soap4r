@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - literal mapping registry.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -75,7 +74,7 @@ private
   end
 
   def any2soap(obj, qname, obj_class)
-    ele = nil
+    #ele = nil
     if obj.is_a?(SOAP::Mapping::Object)
       return mappingobj2soap(obj, qname)
     end

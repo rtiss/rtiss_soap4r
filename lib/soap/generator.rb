@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - SOAP XML Instance Generator library.
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -53,7 +52,7 @@ public
   def generate(obj, io = nil)
     @buf = io || ''
     @indent = ''
-    @encode_char_regexp = get_encode_char_regexp()
+    @encode_char_regexp = get_encode_char_regexp
 
     prologue
     @handlers.each do |uri, handler|

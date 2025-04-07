@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # SOAP4R - SOAP handler servlet for WEBrick
 # Copyright (C) 2000-2007  NAKAMURA, Hiroshi <nahi@ruby-lang.org>.
 
@@ -9,8 +8,8 @@
 
 require 'webrick/httpservlet/abstract'
 require 'webrick/httpstatus'
-require 'soap/rpc/router'
-require 'soap/streamHandler'
+require_relative 'router'
+require_relative '../streamHandler'
 begin
   require 'stringio'
   require 'zlib'

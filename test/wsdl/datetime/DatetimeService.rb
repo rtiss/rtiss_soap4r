@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
-require 'datetimeServant.rb'
+require_relative 'datetimeServant'
 
 require 'soap/rpc/standaloneServer'
 require 'soap/mapping/registry'

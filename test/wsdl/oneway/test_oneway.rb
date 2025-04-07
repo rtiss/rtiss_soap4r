@@ -1,9 +1,8 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'soap/rpc/standaloneServer'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/wsdlDriver'
+require 'test_helper'
 
 
 module WSDL
@@ -38,8 +37,6 @@ class TestOneway < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
-
   def setup
     setup_classdef
     setup_server
@@ -49,15 +46,16 @@ class TestOneway < Test::Unit::TestCase
   def teardown
     teardown_server if @server
     unless $DEBUG
-      File.unlink(pathname('oneway.rb')) if File.file?(pathname('oneway.rb'))
-      File.unlink(pathname('onewayMappingRegistry.rb')) if File.file?(pathname('onewayMappingRegistry.rb'))
-      File.unlink(pathname('onewayDriver.rb')) if File.file?(pathname('onewayDriver.rb'))
+      File.unlink(pathname('oneway.rb'))
+      File.unlink(pathname('onewayMappingRegistry.rb'))
+      File.unlink(pathname('onewayDriver.rb'))
     end
     @client.reset_stream if @client
   end
 
   def setup_server
-    @server = Server.new('Test', "http://www.example.com/oneway", '0.0.0.0', Port)
+    @port = TestUtil.get_free_port
+    @server = Server.new('Test', "http://www.example.com/oneway", '0.0.0.0', @port)
     @server.level = Logger::Severity::ERROR
     @server_thread = TestUtil.start_server_thread(@server)
   end
@@ -87,7 +85,7 @@ class TestOneway < Test::Unit::TestCase
   end
 
   def test_stub
-    @client = OnewayPort.new("http://localhost:#{Port}/")
+    @client = OnewayPort.new("http://localhost:#{@port}/")
     @client.wiredump_dev = STDERR if $DEBUG
     # not raised
     @client.initiate(OnewayProcessRequest.new("msg"))
@@ -96,7 +94,7 @@ class TestOneway < Test::Unit::TestCase
 
   def test_wsdl
     @client = ::SOAP::WSDLDriverFactory.new(pathname('oneway.wsdl')).create_rpc_driver
-    @client.endpoint_url = "http://localhost:#{Port}/"
+    @client.endpoint_url = "http://localhost:#{@port}/"
     @client.wiredump_dev = STDERR if $DEBUG
     # not raised
     @client.initiate(OnewayProcessRequest.new("msg"))

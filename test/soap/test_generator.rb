@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'helper'
+require 'test/unit'
 require 'soap/processor'
 
 
@@ -14,16 +13,12 @@ class TestGenerator < Test::Unit::TestCase
     g.generate(SOAPElement.new('foo'))
     assert_equal("&lt;", g.encode_string(str)[-4, 4])
     #
-    if RUBY_VERSION.to_f >= 1.9
+    begin
+      kc_backup = $KCODE.dup
+      $KCODE = 'EUC-JP'
       assert_equal("&lt;", g.encode_string(str)[-4, 4])
-    else
-      begin
-        kc_backup = $KCODE.dup
-        $KCODE = 'EUC-JP'
-        assert_equal("&lt;", g.encode_string(str)[-4, 4])
-      ensure
-        $KCODE = kc_backup
-      end
+    ensure
+      $KCODE = kc_backup
     end
   end
 end

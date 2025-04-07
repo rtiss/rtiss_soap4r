@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 $serverName = '4S4C'
 $server = 'http://soap.4s4c.com/ilab/soap.asp'

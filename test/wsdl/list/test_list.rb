@@ -1,11 +1,9 @@
-# encoding: UTF-8
-require 'helper'
-require 'testutil'
+require 'test/unit'
 require 'wsdl/parser'
 require 'wsdl/soap/wsdl2ruby'
 require 'soap/rpc/standaloneServer'
 require 'soap/wsdlDriver'
-
+require 'test_helper'
 
 module WSDL; module List
 
@@ -31,7 +29,7 @@ class TestList < Test::Unit::TestCase
 
   DIR = File.dirname(File.expand_path(__FILE__))
 
-  Port = 17171
+  Port = TestUtil.get_free_port
 
   def setup
     setup_server
@@ -41,11 +39,9 @@ class TestList < Test::Unit::TestCase
 
   def teardown
     teardown_server if @server
-    unless $DEBUG
-      File.unlink(pathname('list.rb')) if File.file?(pathname('list.rb'))
-      File.unlink(pathname('listMappingRegistry.rb')) if File.file?(pathname('listMappingRegistry.rb'))
-      File.unlink(pathname('listDriver.rb')) if File.file?(pathname('listDriver.rb'))
-    end  
+    File.unlink(pathname('list.rb')) unless $DEBUG
+    File.unlink(pathname('listMappingRegistry.rb')) unless $DEBUG
+    File.unlink(pathname('listDriver.rb')) unless $DEBUG
     @client.reset_stream if @client
   end
 

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'AmazonSearch.rb'
 
 require 'soap/rpc/driver'
