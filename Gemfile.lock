@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rtiss_soap4r (0)
+    rtiss_soap4r (3.0.0.beta)
       addressable
       cookiejar (~> 0.3.4)
       httpclient (~> 2.9)
