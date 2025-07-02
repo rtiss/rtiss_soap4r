@@ -6,7 +6,7 @@
 
 Gem::Specification.new do |s|
   s.name = "rtiss_soap4r".freeze
-  s.version = "3.0.0.beta"
+  s.version = "0".freeze
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
