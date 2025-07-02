@@ -1,9 +1,18 @@
 PATH
   remote: .
   specs:
-    rtiss_soap4r (3.0.0.beta)
+    rtiss_soap4r (0)
+      addressable
+      cookiejar (~> 0.3.4)
       httpclient (~> 2.9)
-      logger-application (~> 0.0.2)
+      libxml-ruby (~> 5.0, >= 5.0.3)
+      logger-application
+      nokogiri (~> 1.16, >= 1.16.2)
+      oga (~> 3.4)
+      ox (~> 2.14, >= 2.14.22)
+      rake
+      savon (~> 2.14)
+      webrick (~> 1.9, >= 1.9.1)
 
 GEM
   remote: http://rubygems.org/
