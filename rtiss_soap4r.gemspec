@@ -3,10 +3,11 @@
 # Instead, edit Jeweler::Tasks in Rakefile, and run 'rake gemspec'
 # -*- encoding: utf-8 -*-
 # stub: rtiss_soap4r 0 ruby lib
+require File.expand_path('lib/soap/version', __dir__)
 
 Gem::Specification.new do |s|
   s.name = "rtiss_soap4r".freeze
-  s.version = "0".freeze
+  s.version = SOAP::VERSION::STRING
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]

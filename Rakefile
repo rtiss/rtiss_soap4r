@@ -14,6 +14,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "rtiss_soap4r"
+  gem.version = SOAP::VERSION::STRING
   gem.homepage = "https://github.com/rtiss/rtiss_soap4r"
   gem.license = "MIT"
   gem.summary = %Q{Ruby 3.2 compatible soap4r library}
