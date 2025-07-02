@@ -13,13 +13,12 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "soap4r-ruby1.9"
-  gem.homepage = "https://github.com/noeticpenguin/soap4r-noeticpenguin"
+  gem.name = "rtiss_soap4r"
+  gem.homepage = "https://github.com/rtiss/rtiss_soap4r"
   gem.license = "MIT"
-  gem.summary = %Q{Ruby 1.9.2 compatible soap4r library}
-  gem.description = %Q{Ruby 1.9.2 compatible soap4r library}
-  gem.email = "kjp@brightleafsoftware.com"
-  gem.authors = ["kpoorman"]
+  gem.summary = %Q{Ruby 3.2 compatible soap4r library}
+  gem.description = %Q{Ruby 3.2 compatible soap4r library}
+  gem.authors = ["Laurence A. Lee", "Hiroshi NAKAMURA", "Igor Jancev", "Lara Hofer"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
   #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
